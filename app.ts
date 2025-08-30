@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from "express";
-import routeClient from "./routes/client/index.route";
-import routeAdmin from "./routes/admin/index.route";
-import { systemConfig } from "./config/system";
+import routeClient from "./routes/client/index.route.js";
+import routeAdmin from "./routes/admin/index.route.js";
+import { systemConfig } from "./config/system.js";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import methodOverride from "method-override";

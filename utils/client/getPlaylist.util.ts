@@ -1,5 +1,5 @@
-import Playlist from "../../models/playlist.model";
-import User from "../../models/user.model";
+import Playlist from "../../models/playlist.model.js";
+import User from "../../models/user.model.js";
 export const getFullPlaylists = async () => {
   const playlists = await Playlist.find({ status: "active", deleted: false });
   return playlists;

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import Song from "../../models/song.model";
-import Artist from "../../models/artist.model";
-import Playlist from "../../models/playlist.model";
+import Song from "../../models/song.model.js";
+import Artist from "../../models/artist.model.js";
+import Playlist from "../../models/playlist.model.js";
 export const index = async (req: Request, res: Response) => {
   const playlist = await Playlist.findOne({
     _id: req.params.id,

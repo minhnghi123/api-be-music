@@ -1,5 +1,5 @@
-import Song from "../../models/song.model";
-import Artist from "../../models/artist.model";
+import Song from "../../models/song.model.js";
+import Artist from "../../models/artist.model.js";
 export const getFullSongs = async () => {
   const songs = await Song.find({ status: "active", deleted: false });
   for (const song of songs) {

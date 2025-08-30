@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Account from "../../models/account.model";
+import Account from "../../models/account.model.js";
 
 export const index = async (req: Request, res: Response) => {
   try {

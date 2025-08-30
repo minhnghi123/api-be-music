@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import FavoriteSong from "../../models/favorite_song.model";
+import FavoriteSong from "../../models/favorite_song.model.js";
 export const getFavoriteSongOfUser = (userID) => __awaiter(void 0, void 0, void 0, function* () {
     const favoriteSongs = yield FavoriteSong.find({
         user_id: userID,

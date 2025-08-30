@@ -1,7 +1,7 @@
 import express, { Router } from "express";
 const router: Router = express.Router();
-import * as controller from "../../controllers/admin/music.controller";
-import { uploadFields } from "../../middlewares/admin/uploadCloud.middleware";
+import * as controller from "../../controllers/admin/music.controller.js";
+import { uploadFields } from "../../middlewares/admin/uploadCloud.middleware.js";
 import multer from "multer";
 
 const upload = multer();

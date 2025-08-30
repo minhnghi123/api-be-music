@@ -1,10 +1,10 @@
 import { Express } from "express";
-import { systemConfig } from "../../config/system";
-import { dashboardRoute } from "./dashboard.route";
-import { musicRoute } from "./music.route";
-import { topicRoute } from "./topic.route";
-import { accountRouter } from "./account.route";
-import { playlistRoute } from "./playlist.route";
+import { systemConfig } from "../../config/system.js";
+import { dashboardRoute } from "./dashboard.route.js";
+import { musicRoute } from "./music.route.js";
+import { topicRoute } from "./topic.route.js";
+import { accountRouter } from "./account.route.js";
+import { playlistRoute } from "./playlist.route.js";
 
 const routeAdmin = (app: Express) => {
   const path = systemConfig.prefixAdmin;

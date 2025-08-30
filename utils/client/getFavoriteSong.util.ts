@@ -1,4 +1,4 @@
-import FavoriteSong from "../../models/favorite_song.model";
+import FavoriteSong from "../../models/favorite_song.model.js";
 export const getFavoriteSongOfUser = async (userID: String) => {
   const favoriteSongs = await FavoriteSong.find({
     user_id: userID,

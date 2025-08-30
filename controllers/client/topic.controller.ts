@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import Topic from "../../models/topic.model";
-import Song from "../../models/song.model";
-import Artist from "../../models/artist.model";
-import FavoriteSong from "../../models/favorite_song.model";
-import User from "../../models/user.model";
+import Topic from "../../models/topic.model.js";
+import Song from "../../models/song.model.js";
+import Artist from "../../models/artist.model.js";
+import FavoriteSong from "../../models/favorite_song.model.js";
+import User from "../../models/user.model.js";
 
 export const index = async (req: Request, res: Response) => {
   try {

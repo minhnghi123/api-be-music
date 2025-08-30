@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import User from "../../models/user.model";
+import User from "../../models/user.model.js";
 import bcryptjs from "bcryptjs";
-import { generateTokenAndSetToken } from "../../helpers/JWT.helper";
+import { generateTokenAndSetToken } from "../../helpers/JWT.helper.js";
 // import { ForgotPassword } from "../../models/Forgot-Password.model.js";
 // import { generateRandomString } from "../../helpers/generateNumber.helper.js";
 // import { sendMail } from "../../helpers/sendMail.helper.js";

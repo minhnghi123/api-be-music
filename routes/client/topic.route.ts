@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-import * as controller from "../../controllers/client/topic.controller";
+import * as controller from "../../controllers/client/topic.controller.js";
 
 router.get("/:id", controller.index);
 

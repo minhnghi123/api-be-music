@@ -1,7 +1,7 @@
 import { Request, response, Response } from "express";
-import FavoriteSong from "../../models/favorite_song.model";
-import Song from "../../models/song.model";
-import Artist from "../../models/artist.model";
+import FavoriteSong from "../../models/favorite_song.model.js";
+import Song from "../../models/song.model.js";
+import Artist from "../../models/artist.model.js";
 
 export const index = async (req: Request, res: Response) => {
   try {

@@ -1,8 +1,8 @@
 import express from "express";
 const router = express.Router();
-import * as controller from "../../controllers/client/playlist.controller";
+import * as controller from "../../controllers/client/playlist.controller.js";
 import multer from "multer";
-import { uploadSingle } from "../../middlewares/admin/uploadCloud.middleware";
+import { uploadSingle } from "../../middlewares/admin/uploadCloud.middleware.js";
 const upload = multer();
 router.get("/", controller.index);
 router.get("/:id", controller.index);

@@ -8,11 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import mongoose from "mongoose";
-import Song from "../../models/song.model";
-import Artist from "../../models/artist.model";
-import User from "../../models/user.model";
-import { getPlaylistOfUser } from "../../utils/client/getPlaylist.util";
-import { getFavoriteSongOfUser } from "../../utils/client/getFavoriteSong.util";
+import Song from "../../models/song.model.js";
+import Artist from "../../models/artist.model.js";
+import User from "../../models/user.model.js";
+import { getPlaylistOfUser } from "../../utils/client/getPlaylist.util.js";
+import { getFavoriteSongOfUser } from "../../utils/client/getFavoriteSong.util.js";
 export const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.params.userId;

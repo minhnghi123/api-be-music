@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import Artist from "../../models/artist.model";
-import User from "../../models/user.model";
-import Song from "../../models/song.model";
-import { getFavoriteSongOfUser } from "../../utils/client/getFavoriteSong.util";
-import getUserInfo from "../../utils/client/getUserInfo.util";
-import { getPlaylistOfUser } from "../../utils/client/getPlaylist.util";
+import Artist from "../../models/artist.model.js";
+import User from "../../models/user.model.js";
+import Song from "../../models/song.model.js";
+import { getFavoriteSongOfUser } from "../../utils/client/getFavoriteSong.util.js";
+import getUserInfo from "../../utils/client/getUserInfo.util.js";
+import { getPlaylistOfUser } from "../../utils/client/getPlaylist.util.js";
 export const index = async (req: Request, res: Response) => {
   try {
     const userID = getUserInfo(req, res);

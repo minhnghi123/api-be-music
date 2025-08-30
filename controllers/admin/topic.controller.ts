@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import Topic from "../../models/topic.model";
-import { systemConfig } from "../../config/system";
+import Topic from "../../models/topic.model.js";
+import { systemConfig } from "../../config/system.js";
 
 export const index = async (req: Request, res: Response) => {
   try {

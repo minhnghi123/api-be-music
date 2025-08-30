@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { streamUpload } from "../../helpers/cloudinary.helper";
+import { streamUpload } from "../../helpers/cloudinary.helper.js";
 export const uploadSingle = (req, res, next) => {
     if (req["file"] && req["file"].fieldname && req["file"].buffer) {
         function upload(req) {

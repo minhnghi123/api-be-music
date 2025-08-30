@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-import { streamUpload } from "../../helpers/cloudinary.helper";
+import { streamUpload } from "../../helpers/cloudinary.helper.js";
 
 export const uploadSingle = (
   req: Request,

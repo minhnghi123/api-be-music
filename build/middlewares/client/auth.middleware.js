@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import User from "../../models/user.model";
+import User from "../../models/user.model.js";
 import jwt from "jsonwebtoken";
 export const authSignUp = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, email, password, rePassword } = req.body;

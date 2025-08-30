@@ -1,8 +1,8 @@
 import express from "express";
 const router = express.Router();
-import * as controller from "../../controllers/client/playlist.controller";
+import * as controller from "../../controllers/client/playlist.controller.js";
 import multer from "multer";
-import { uploadSingle } from "../../middlewares/admin/uploadCloud.middleware";
+import { uploadSingle } from "../../middlewares/admin/uploadCloud.middleware.js";
 
 const upload = multer();
 
@@ -11,8 +11,9 @@ router.get("/:id", controller.index);
 router.post("/create-playlist", controller.createPlaylist);
 router.patch("/add-playlist", controller.addPlaylist);
 router.patch(
-    "/save-playlist/:id",
-    upload.single("coverImage"),
-    uploadSingle,
-    controller.savePlaylist);
+  "/save-playlist/:id",
+  upload.single("coverImage"),
+  uploadSingle,
+  controller.savePlaylist
+);
 export default router;

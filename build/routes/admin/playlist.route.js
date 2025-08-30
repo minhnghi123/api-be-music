@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
-import * as controller from "../../controllers/admin/playlist.controller";
-import { uploadSingle, } from "../../middlewares/admin/uploadCloud.middleware";
+import * as controller from "../../controllers/admin/playlist.controller.js";
+import { uploadSingle, } from "../../middlewares/admin/uploadCloud.middleware.js";
 import multer from "multer";
 const upload = multer();
 router.get("/", controller.index);

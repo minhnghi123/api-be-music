@@ -7,16 +7,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import Song from "../../models/song.model";
-import Playlist from "../../models/playlist.model";
-import User from "../../models/user.model";
+import Song from "../../models/song.model.js";
+import Playlist from "../../models/playlist.model.js";
+import User from "../../models/user.model.js";
 import Fuse from "fuse.js";
-import getUserInfo from "../../utils/client/getUserInfo.util";
-import { getFullArtists } from "../../utils/client/getArtist.util";
-import { getFullPlaylists, getPlaylistOfUser, } from "../../utils/client/getPlaylist.util";
-import { getFullSongs } from "../../utils/client/getSong.util";
-import { getFavoriteSongOfUser } from "../../utils/client/getFavoriteSong.util";
-import { getFullTopics } from "../../utils/client/getTopic.util";
+import getUserInfo from "../../utils/client/getUserInfo.util.js";
+import { getFullArtists } from "../../utils/client/getArtist.util.js";
+import { getFullPlaylists, getPlaylistOfUser, } from "../../utils/client/getPlaylist.util.js";
+import { getFullSongs } from "../../utils/client/getSong.util.js";
+import { getFavoriteSongOfUser } from "../../utils/client/getFavoriteSong.util.js";
+import { getFullTopics } from "../../utils/client/getTopic.util.js";
 export const home = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const keyword = req.query.search;
     const userID = getUserInfo(req, res);

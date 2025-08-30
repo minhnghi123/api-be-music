@@ -1,18 +1,18 @@
 import { Request, Response } from "express";
-import Song from "../../models/song.model";
-import FavoriteSong from "../../models/favorite_song.model";
-import Playlist from "../../models/playlist.model";
-import User from "../../models/user.model";
+import Song from "../../models/song.model.js";
+import FavoriteSong from "../../models/favorite_song.model.js";
+import Playlist from "../../models/playlist.model.js";
+import User from "../../models/user.model.js";
 import Fuse from "fuse.js";
-import getUserInfo from "../../utils/client/getUserInfo.util";
-import { getFullArtists } from "../../utils/client/getArtist.util";
+import getUserInfo from "../../utils/client/getUserInfo.util.js";
+import { getFullArtists } from "../../utils/client/getArtist.util.js";
 import {
   getFullPlaylists,
   getPlaylistOfUser,
-} from "../../utils/client/getPlaylist.util";
-import { getFullSongs } from "../../utils/client/getSong.util";
-import { getFavoriteSongOfUser } from "../../utils/client/getFavoriteSong.util";
-import { getFullTopics } from "../../utils/client/getTopic.util";
+} from "../../utils/client/getPlaylist.util.js";
+import { getFullSongs } from "../../utils/client/getSong.util.js";
+import { getFavoriteSongOfUser } from "../../utils/client/getFavoriteSong.util.js";
+import { getFullTopics } from "../../utils/client/getTopic.util.js";
 
 export const home = async (req: Request, res: Response) => {
   //finding logic

@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import Artist from "../../models/artist.model";
+import Artist from "../../models/artist.model.js";
 export const getFullArtists = () => __awaiter(void 0, void 0, void 0, function* () {
     const artists = yield Artist.find({ status: "active", deleted: false });
     return artists;

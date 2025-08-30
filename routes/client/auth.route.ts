@@ -1,11 +1,11 @@
 import express from "express";
 const router = express.Router();
 import passport from "passport";
-import * as controller from "../../controllers/client/auth.controller";
-import { authSignUp } from "../../middlewares/client/auth.middleware";
-import { googleConfig } from "../../config/OAUTH2/google.config";
-import { generateTokenAndSetToken } from "../../helpers/JWT.helper";
-import { authUserInMainPage } from "../../middlewares/client/auth.middleware";
+import * as controller from "../../controllers/client/auth.controller.js";
+import { authSignUp } from "../../middlewares/client/auth.middleware.js";
+import { googleConfig } from "../../config/OAUTH2/google.config.js";
+import { generateTokenAndSetToken } from "../../helpers/JWT.helper.js";
+import { authUserInMainPage } from "../../middlewares/client/auth.middleware.js";
 googleConfig();
 router.get(
   "/google",

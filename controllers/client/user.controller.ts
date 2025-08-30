@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
-import Topic from "../../models/topic.model";
-import Song from "../../models/song.model";
-import Artist from "../../models/artist.model";
-import User from "../../models/user.model";
-import { getPlaylistOfUser } from "../../utils/client/getPlaylist.util";
-import { getFavoriteSongOfUser } from "../../utils/client/getFavoriteSong.util";
+import Topic from "../../models/topic.model.js";
+import Song from "../../models/song.model.js";
+import Artist from "../../models/artist.model.js";
+import User from "../../models/user.model.js";
+import { getPlaylistOfUser } from "../../utils/client/getPlaylist.util.js";
+import { getFavoriteSongOfUser } from "../../utils/client/getFavoriteSong.util.js";
 
 export const index = async (req: Request, res: Response) => {
   try {
