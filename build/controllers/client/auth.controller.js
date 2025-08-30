@@ -7,17 +7,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import User from "../../models/user.model.js";
+import User from "../../models/user.model";
 import bcryptjs from "bcryptjs";
-import { generateTokenAndSetToken } from "../../helpers/JWT.helper.js";
+import { generateTokenAndSetToken } from "../../helpers/JWT.helper";
 export function login(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        res.render("client/pages/auth/login.pug");
+        res.json({
+            success: true,
+            message: "Login page (API only)",
+        });
     });
 }
 export function signup(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        res.render("client/pages/auth/sign-up.pug");
+        res.json({
+            success: true,
+            message: "Sign up page (API only)",
+        });
     });
 }
 export function loginPost(req, res) {
@@ -37,12 +43,12 @@ export function loginPost(req, res) {
                 res.redirect("back");
                 return;
             }
-            const isPasswordMatch = yield bcryptjs.compare(password, user.password);
+            const isPasswordMatch = yield bcryptjs.compare(password, String(user.password));
             if (!isPasswordMatch) {
                 res.redirect("back");
                 return;
             }
-            generateTokenAndSetToken(user._id.toString(), res);
+            generateTokenAndSetToken(String(user._id), res);
             res.redirect("/");
         }
         catch (error) {
@@ -65,8 +71,8 @@ export function signupPost(req, res) {
                 password: hashedPassword,
             });
             if (newUser) {
-                generateTokenAndSetToken(newUser._id.toString(), res);
                 yield newUser.save();
+                generateTokenAndSetToken(String(newUser._id), res);
             }
             else {
                 res.redirect("back");

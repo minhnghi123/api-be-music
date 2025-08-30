@@ -7,28 +7,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import Topic from "../../models/topic.model.js";
-import Song from "../../models/song.model.js";
-import Artist from "../../models/artist.model.js";
-import FavoriteSong from "../../models/favorite_song.model.js";
-import User from "../../models/user.model.js";
+import Topic from "../../models/topic.model";
+import Song from "../../models/song.model";
+import Artist from "../../models/artist.model";
+import FavoriteSong from "../../models/favorite_song.model";
+import User from "../../models/user.model";
 export const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = req.params.id;
         const topic = yield Topic.findOne({
             _id: id,
-            deleted: false
+            deleted: false,
         });
         const songs = yield Song.find({
             topic: {
-                $in: id
+                $in: id,
             },
-            deleted: false
+            deleted: false,
         });
         for (const song of songs) {
             const artist = yield Artist.findOne({
                 _id: song.artist,
-                deleted: false
+                deleted: false,
             });
             if (!artist) {
                 song.artist = "Không tìm thấy thông tin nghệ sĩ";
@@ -37,25 +37,28 @@ export const index = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 song["artistFullName"] = artist.fullName;
             }
         }
-        let favoriteSongIds = null;
-        let followSongIds = null;
+        let favoriteSongIds = [];
+        let followSongIds = [];
         if (res.locals.user) {
             const favoriteSongs = yield FavoriteSong.find({
                 user_id: res.locals.user.id,
-                deleted: false
+                deleted: false,
             }).select("song_id");
-            favoriteSongIds = favoriteSongs.map(item => item.song_id.toString());
+            favoriteSongIds = favoriteSongs.map((item) => item.song_id.toString());
             const user = yield User.findOne({
                 _id: res.locals.user.id,
-                deleted: false
+                deleted: false,
             }).select("follow_songs");
-            const followSongIds = user === null || user === void 0 ? void 0 : user.follow_songs.map(item => item.toString());
+            if (user && user.follow_songs) {
+                followSongIds = user.follow_songs.map((item) => item.toString());
+            }
         }
-        res.render("client/pages/topics/index.pug", {
-            topic: topic,
-            songs: songs,
-            favoriteSongIds: favoriteSongIds,
-            followSongIds: followSongIds
+        res.json({
+            success: true,
+            topic,
+            songs,
+            favoriteSongIds,
+            followSongIds,
         });
     }
     catch (error) {
@@ -68,14 +71,16 @@ export const followTopic = (req, res) => __awaiter(void 0, void 0, void 0, funct
         const userID = res.locals.user.id;
         const user = yield User.findOne({
             _id: userID,
-            deleted: false
+            deleted: false,
         }).select("follow_songs");
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: "User not found" });
         }
-        let tempArray = user.follow_songs;
+        let tempArray = Array.isArray(user.follow_songs)
+            ? user.follow_songs.map((item) => item.toString())
+            : [];
         if (tempArray.includes(id)) {
-            tempArray = tempArray.filter(playlistID => playlistID != id);
+            tempArray = tempArray.filter((playlistID) => playlistID != id);
             res.json({ code: "remove" });
         }
         else {
@@ -85,8 +90,8 @@ export const followTopic = (req, res) => __awaiter(void 0, void 0, void 0, funct
         user.follow_songs = tempArray;
         yield User.updateOne({
             _id: userID,
-            deleted: false
-        }, user);
+            deleted: false,
+        }, { $set: { follow_songs: tempArray } });
     }
     catch (error) {
         console.log(error);

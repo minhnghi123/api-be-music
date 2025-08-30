@@ -7,9 +7,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import FavoriteSong from "../../models/favorite_song.model.js";
-import Song from "../../models/song.model.js";
-import Artist from "../../models/artist.model.js";
+import FavoriteSong from "../../models/favorite_song.model";
+import Song from "../../models/song.model";
+import Artist from "../../models/artist.model";
 export const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
@@ -17,20 +17,22 @@ export const index = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (id) {
             const favoriteSongs = yield FavoriteSong.find({
                 user_id: id,
-                deleted: false
+                deleted: false,
             }).select("song_id");
             const songs = [];
             for (const favoriteSong of favoriteSongs) {
                 const song = yield Song.findOne({
                     _id: favoriteSong.song_id,
-                    deleted: false
+                    deleted: false,
                 });
                 songs.push(song);
             }
             for (const song of songs) {
+                if (!song)
+                    continue;
                 const artist = yield Artist.findOne({
-                    _id: song === null || song === void 0 ? void 0 : song.artist,
-                    deleted: false
+                    _id: song.artist,
+                    deleted: false,
                 }).select("fullName");
                 if (!artist) {
                     song.artist = "Không tìm thấy thông tin nghệ sĩ";
@@ -39,10 +41,11 @@ export const index = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                     song.artist = artist.fullName;
                 }
             }
-            const favoriteSongIds = favoriteSongs.map(item => item.song_id.toString());
-            res.render("client/pages/favorite-songs/index.pug", {
-                songs: songs,
-                favoriteSongIds: favoriteSongIds
+            const favoriteSongIds = favoriteSongs.map((item) => item.song_id.toString());
+            res.json({
+                success: true,
+                songs,
+                favoriteSongIds,
             });
         }
         else {
@@ -65,14 +68,14 @@ export const addFavoriteSong = (req, res) => __awaiter(void 0, void 0, void 0, f
                     yield FavoriteSong.updateOne({ song_id: id }, {
                         user_id: userID,
                         deleted: false,
-                        removed_at: null
+                        removed_at: null,
                     });
                     res.json({ code: "success" });
                 }
                 else {
                     yield FavoriteSong.updateOne({ song_id: id }, {
                         deleted: true,
-                        removed_at: new Date()
+                        removed_at: new Date(),
                     });
                     res.json({ code: "remove" });
                 }
@@ -87,7 +90,7 @@ export const addFavoriteSong = (req, res) => __awaiter(void 0, void 0, void 0, f
             }
         }
         else {
-            res.render("client/pages/auth/login.pug");
+            res.status(401).json({ success: false, message: "Unauthorized" });
         }
     }
     catch (error) {

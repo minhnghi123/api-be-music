@@ -7,17 +7,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import Account from "../../models/account.model.js";
+import Account from "../../models/account.model";
 export const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const admins = yield Account.find({
             role_id: { $ne: "CUSTOMER" },
-            deleted: false
+            deleted: false,
         });
         console.log(admins);
-        res.render("admin/pages/accounts/admin/index.pug", {
-            pageTitle: "Trang danh sách tài khoản nhân viên",
-            admins: admins
+        res.json({
+            success: true,
+            admins,
         });
     }
     catch (error) {
