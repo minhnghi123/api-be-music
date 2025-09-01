@@ -4,12 +4,19 @@ import Artist from "../../models/artist.model.js";
 import Playlist from "../../models/playlist.model.js";
 import Topic from "../../models/topic.model.js";
 import User from "../../models/user.model.js";
-
+import { mapArtistIdToInfo } from "../../utils/client/mapArtistIdToInfo.util.js";
 // Get all songs
 export const getAllSongs = async (req: Request, res: Response) => {
   try {
     const songs = await Song.find({ deleted: false, status: "active" });
-    res.json({ success: true, data: songs });
+    // format artist name
+    const formattedSongs = await Promise.all(
+      songs.map(async (song) => {
+        const artistInfo = await mapArtistIdToInfo(song.artist);
+        return { ...song.toObject(), artist: artistInfo };
+      })
+    );
+    res.json({ success: true, data: formattedSongs });
   } catch (err) {
     res
       .status(500)
@@ -26,7 +33,12 @@ export const getSongById = async (req: Request, res: Response) => {
         .status(404)
         .json({ success: false, message: "Song not found" });
     }
-    res.json({ success: true, data: song });
+    // format artist name
+    const artistInfo = await mapArtistIdToInfo(song.artist);
+    res.json({
+      success: true,
+      data: { ...song.toObject(), artist: artistInfo },
+    });
   } catch (err) {
     res
       .status(500)

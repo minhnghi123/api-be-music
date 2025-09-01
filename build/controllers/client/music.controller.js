@@ -12,10 +12,15 @@ import Artist from "../../models/artist.model.js";
 import Playlist from "../../models/playlist.model.js";
 import Topic from "../../models/topic.model.js";
 import User from "../../models/user.model.js";
+import { mapArtistIdToInfo } from "../../utils/client/mapArtistIdToInfo.util.js";
 export const getAllSongs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const songs = yield Song.find({ deleted: false, status: "active" });
-        res.json({ success: true, data: songs });
+        const formattedSongs = yield Promise.all(songs.map((song) => __awaiter(void 0, void 0, void 0, function* () {
+            const artistInfo = yield mapArtistIdToInfo(song.artist);
+            return Object.assign(Object.assign({}, song.toObject()), { artist: artistInfo });
+        })));
+        res.json({ success: true, data: formattedSongs });
     }
     catch (err) {
         res
@@ -31,7 +36,11 @@ export const getSongById = (req, res) => __awaiter(void 0, void 0, void 0, funct
                 .status(404)
                 .json({ success: false, message: "Song not found" });
         }
-        res.json({ success: true, data: song });
+        const artistInfo = yield mapArtistIdToInfo(song.artist);
+        res.json({
+            success: true,
+            data: Object.assign(Object.assign({}, song.toObject()), { artist: artistInfo }),
+        });
     }
     catch (err) {
         res
