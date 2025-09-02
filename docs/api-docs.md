@@ -2,7 +2,168 @@
 
 ## Tổng quan
 
-Đây là tài liệu RESTful API cho hệ thống quản lý music, artist, playlist, topic, user.
+Đây là tài liệu RESTful API cho hệ thống quản lý music, artist, playlist, topic, user, authentication, admin.
+
+---
+
+## Authentication
+
+### Đăng ký
+
+- **POST** `/auth/sign-up`
+- **Body:**
+
+```json
+{
+  "username": "string",
+  "email": "string",
+  "password": "string",
+  "rePassword": "string"
+}
+```
+
+- **Response:**
+
+```json
+{ "success": true, "message": "Sign up page (API only)" }
+```
+
+### Đăng nhập
+
+- **POST** `/auth/login`
+- **Body:**
+
+```json
+{
+  "username": "string",
+  "password": "string"
+}
+```
+
+- **Response:**
+
+```json
+{ "success": true, "message": "Login page (API only)" }
+```
+
+### Đăng xuất
+
+- **POST** `/auth/logout`
+- **Response:**
+
+```json
+{ "code": 200, "message": "Logout successfully" }
+```
+
+### Đăng nhập Google OAuth2
+
+- **GET** `/auth/google`
+- **GET** `/auth/google/callback`
+
+---
+
+## Client API
+
+### Home
+
+- **GET** `/`  
+  Trả về trang chủ, tìm kiếm, autocomplete.
+- **GET** `/autocomplete`  
+  Gợi ý từ khóa bài hát.
+
+### Music
+
+- **GET** `/music/songs`
+- **GET** `/music/songs/:id`
+- **POST** `/music/songs`
+- **PUT** `/music/songs/:id`
+- **DELETE** `/music/songs/:id`
+  > Xem chi tiết response ở phần Song bên dưới.
+
+### Artist
+
+- **GET** `/artist/:id`  
+  Trả về thông tin nghệ sĩ, danh sách bài hát, trạng thái follow.
+- **PATCH** `/artist/:id`  
+  Follow nghệ sĩ.
+
+### Playlist
+
+- **GET** `/playlist`
+- **GET** `/playlist/:id`
+- **POST** `/playlist/create-playlist`
+- **PATCH** `/playlist/add-playlist`
+- **PATCH** `/playlist/save-playlist/:id`  
+  Thêm, lưu, tạo playlist.
+
+### Topic
+
+- **GET** `/topics/:id`  
+  Trả về thông tin chủ đề, danh sách bài hát theo chủ đề.
+- **PATCH** `/topics/:id`  
+  Follow chủ đề.
+
+### Favorite Song
+
+- **GET** `/favorite-songs`  
+  Lấy danh sách bài hát yêu thích của user.
+- **PATCH** `/favorite-songs/favorite-song/:id`  
+  Thêm bài hát vào danh sách yêu thích.
+
+### User
+
+- **GET** `/user/profile/:userId`  
+  Lấy thông tin profile user.
+
+---
+
+## Admin API
+
+### Dashboard
+
+- **GET** `/admin/dashboard`  
+  Trả về thông tin dashboard.
+
+### Music (Quản lý bài hát)
+
+- **GET** `/admin/songs`  
+  Lấy danh sách bài hát.
+- **GET** `/admin/songs/create`  
+  Trả về form tạo bài hát.
+- **POST** `/admin/songs/create`  
+  Tạo mới bài hát (có upload avatar/audio).
+- **GET** `/admin/songs/edit/:id`  
+  Trả về form chỉnh sửa bài hát.
+- **PATCH** `/admin/songs/edit/:id`  
+  Chỉnh sửa bài hát (có upload avatar/audio).
+- **PATCH** `/admin/songs/delete/:id`  
+  Xóa (soft delete) bài hát.
+
+### Playlist (Quản lý playlist)
+
+- **GET** `/admin/playlists`
+- **GET** `/admin/playlists/create`
+- **POST** `/admin/playlists/create`  
+  Tạo mới playlist (có upload avatar).
+
+### Topic (Quản lý chủ đề)
+
+- **GET** `/admin/topics`
+- **GET** `/admin/topics/create`
+- **POST** `/admin/topics/create`  
+  Tạo mới chủ đề (có upload ảnh).
+- **GET** `/admin/topics/edit/:id`
+- **PATCH** `/admin/topics/edit/:id`  
+  Chỉnh sửa chủ đề (có upload ảnh).
+- **DELETE** `/admin/topics/delete/:id`  
+  Xóa chủ đề.
+
+### Account (Quản lý tài khoản)
+
+- **GET** `/admin/accounts/admin`  
+  Lấy danh sách tài khoản admin.
+- **GET** `/admin/accounts/customer`  
+  Lấy danh sách tài khoản khách hàng.
 
 ---
 
@@ -10,7 +171,7 @@
 
 ### Lấy tất cả bài hát
 
-- **GET** `/api/music/songs`
+- **GET** `/music/songs`
 - **Response:**
 
 ```json
@@ -20,7 +181,7 @@
     {
       "_id": "string",
       "title": "string",
-      "artist": "string",
+      "artist": { "id": "string", "fullName": "string" },
       "album": "string",
       "topic": ["string"],
       "fileUrl": "string",
@@ -39,7 +200,7 @@
 
 ### Lấy chi tiết bài hát
 
-- **GET** `/api/music/songs/:id`
+- **GET** `/music/songs/:id`
 - **Response:**
 
 ```json
@@ -48,7 +209,7 @@
   "data": {
     "_id": "string",
     "title": "string",
-    "artist": "string",
+    "artist": { "id": "string", "fullName": "string" },
     "album": "string",
     "topic": ["string"],
     "fileUrl": "string",
@@ -66,7 +227,7 @@
 
 ### Tạo mới bài hát
 
-- **POST** `/api/music/songs`
+- **POST** `/music/songs`
 - **Body:**
 
 ```json
@@ -93,7 +254,7 @@
 
 ### Cập nhật bài hát
 
-- **PUT** `/api/music/songs/:id`
+- **PUT** `/music/songs/:id`
 - **Body:**
 
 ```json
@@ -120,7 +281,7 @@
 
 ### Xóa bài hát
 
-- **DELETE** `/api/music/songs/:id`
+- **DELETE** `/music/songs/:id`
 - **Response:**
 
 ```json
@@ -136,7 +297,7 @@
 
 ### Lấy tất cả nghệ sĩ
 
-- **GET** `/api/music/artists`
+- **GET** `/music/artists`
 - **Response:**
 
 ```json
@@ -161,14 +322,14 @@
 
 ### Lấy chi tiết nghệ sĩ
 
-- **GET** `/api/music/artists/:id`
+- **GET** `/music/artists/:id`
 - **Response:**
 
 ```json
 {
   "success": true,
   "data": {
-    "_id": "string",
+    "id": "string",
     "fullName": "string",
     "country": "string",
     "albums": ["string"],
@@ -184,7 +345,7 @@
 
 ### Tạo mới nghệ sĩ
 
-- **POST** `/api/music/artists`
+- **POST** `/music/artists`
 - **Body:**
 
 ```json
@@ -208,7 +369,7 @@
 
 ### Cập nhật nghệ sĩ
 
-- **PUT** `/api/music/artists/:id`
+- **PUT** `/music/artists/:id`
 - **Body:**
 
 ```json
@@ -232,7 +393,7 @@
 
 ### Xóa nghệ sĩ
 
-- **DELETE** `/api/music/artists/:id`
+- **DELETE** `/music/artists/:id`
 - **Response:**
 
 ```json
@@ -248,7 +409,7 @@
 
 ### Lấy tất cả playlist
 
-- **GET** `/api/music/playlists`
+- **GET** `/music/playlists`
 - **Response:**
 
 ```json
@@ -274,7 +435,7 @@
 
 ### Lấy chi tiết playlist
 
-- **GET** `/api/music/playlists/:id`
+- **GET** `/music/playlists/:id`
 - **Response:**
 
 ```json
@@ -298,7 +459,7 @@
 
 ### Tạo mới playlist
 
-- **POST** `/api/music/playlists`
+- **POST** `/music/playlists`
 - **Body:**
 
 ```json
@@ -324,7 +485,7 @@
 
 ### Cập nhật playlist
 
-- **PUT** `/api/music/playlists/:id`
+- **PUT** `/music/playlists/:id`
 - **Body:**
 
 ```json
@@ -350,7 +511,7 @@
 
 ### Xóa playlist
 
-- **DELETE** `/api/music/playlists/:id`
+- **DELETE** `/music/playlists/:id`
 - **Response:**
 
 ```json
@@ -366,7 +527,7 @@
 
 ### Lấy tất cả chủ đề
 
-- **GET** `/api/music/topics`
+- **GET** `/music/topics`
 - **Response:**
 
 ```json
@@ -388,7 +549,7 @@
 
 ### Lấy chi tiết chủ đề
 
-- **GET** `/api/music/topics/:id`
+- **GET** `/music/topics/:id`
 - **Response:**
 
 ```json
@@ -408,7 +569,7 @@
 
 ### Tạo mới chủ đề
 
-- **POST** `/api/music/topics`
+- **POST** `/music/topics`
 - **Body:**
 
 ```json
@@ -430,7 +591,7 @@
 
 ### Cập nhật chủ đề
 
-- **PUT** `/api/music/topics/:id`
+- **PUT** `/music/topics/:id`
 - **Body:**
 
 ```json
@@ -452,7 +613,7 @@
 
 ### Xóa chủ đề
 
-- **DELETE** `/api/music/topics/:id`
+- **DELETE** `/music/topics/:id`
 - **Response:**
 
 ```json
@@ -468,7 +629,7 @@
 
 ### Lấy tất cả user
 
-- **GET** `/api/music/users`
+- **GET** `/music/users`
 - **Response:**
 
 ```json
@@ -494,7 +655,7 @@
 
 ### Lấy chi tiết user
 
-- **GET** `/api/music/users/:id`
+- **GET** `/music/users/:id`
 - **Response:**
 
 ```json
@@ -518,7 +679,7 @@
 
 ### Tạo mới user
 
-- **POST** `/api/music/users`
+- **POST** `/music/users`
 - **Body:**
 
 ```json
@@ -544,7 +705,7 @@
 
 ### Cập nhật user
 
-- **PUT** `/api/music/users/:id`
+- **PUT** `/music/users/:id`
 - **Body:**
 
 ```json
@@ -570,7 +731,7 @@
 
 ### Xóa user
 
-- **DELETE** `/api/music/users/:id`
+- **DELETE** `/music/users/:id`
 - **Response:**
 
 ```json
@@ -582,15 +743,106 @@
 
 ---
 
+## Các API đặc biệt client
+
+### Artist
+
+- **GET** `/artist/:id`  
+  Trả về thông tin nghệ sĩ, danh sách bài hát, trạng thái follow.
+- **PATCH** `/artist/:id`  
+  Follow nghệ sĩ.
+
+### Topic
+
+- **GET** `/topics/:id`  
+  Trả về thông tin chủ đề, danh sách bài hát theo chủ đề.
+- **PATCH** `/topics/:id`  
+  Follow chủ đề.
+
+### Playlist
+
+- **GET** `/playlist/:id`  
+  Lấy chi tiết playlist.
+- **POST** `/playlist/create-playlist`  
+  Tạo mới playlist.
+- **PATCH** `/playlist/add-playlist`  
+  Thêm bài hát vào playlist.
+- **PATCH** `/playlist/save-playlist/:id`  
+  Lưu playlist với ảnh.
+
+### Favorite Song
+
+- **GET** `/favorite-songs`  
+  Lấy danh sách bài hát yêu thích của user.
+- **PATCH** `/favorite-songs/favorite-song/:id`  
+  Thêm bài hát vào danh sách yêu thích.
+
+### User
+
+- **GET** `/user/profile/:userId`  
+  Lấy thông tin profile user.
+
+---
+
+## Admin API chi tiết
+
+### Dashboard
+
+- **GET** `/admin/dashboard`  
+  Trả về thông tin dashboard.
+
+### Music
+
+- **GET** `/admin/songs`  
+  Lấy danh sách bài hát.
+- **GET** `/admin/songs/create`  
+  Trả về form tạo bài hát.
+- **POST** `/admin/songs/create`  
+  Tạo mới bài hát (có upload avatar/audio).
+- **GET** `/admin/songs/edit/:id`  
+  Trả về form chỉnh sửa bài hát.
+- **PATCH** `/admin/songs/edit/:id`  
+  Chỉnh sửa bài hát (có upload avatar/audio).
+- **PATCH** `/admin/songs/delete/:id`  
+  Xóa (soft delete) bài hát.
+
+### Playlist
+
+- **GET** `/admin/playlists`
+- **GET** `/admin/playlists/create`
+- **POST** `/admin/playlists/create`  
+  Tạo mới playlist (có upload avatar).
+
+### Topic
+
+- **GET** `/admin/topics`
+- **GET** `/admin/topics/create`
+- **POST** `/admin/topics/create`  
+  Tạo mới chủ đề (có upload ảnh).
+- **GET** `/admin/topics/edit/:id`
+- **PATCH** `/admin/topics/edit/:id`  
+  Chỉnh sửa chủ đề (có upload ảnh).
+- **DELETE** `/admin/topics/delete/:id`  
+  Xóa chủ đề.
+
+### Account
+
+- **GET** `/admin/accounts/admin`  
+  Lấy danh sách tài khoản admin.
+- **GET** `/admin/accounts/customer`  
+  Lấy danh sách tài khoản khách hàng.
+
+---
+
 ## Lưu ý
 
-- Tất cả response đều có trường `success`, `data` hoặc `message`.
-- Đường dẫn API có thể cần prefix `/api/music` tùy cấu hình router.
-- Các trường trong body có thể mở rộng theo model thực tế.
+- Các API upload file sử dụng multipart/form-data.
+- Các API đều trả về trường `success`, `data`, hoặc `message`.
+- Đường dẫn có thể có prefix `/admin` hoặc `/music` tùy loại API.
 
 ## Ví dụ sử dụng với curl
 
 ```bash
-curl -X GET http://localhost:3000/api/music/songs
-curl -X POST http://localhost:3000/api/music/songs -H "Content-Type: application/json" -d '{"title":"Song Name","artist":"Artist Name"}'
+curl -X GET http://localhost:3000/music/songs
+curl -X POST http://localhost:3000/auth/login -H "Content-Type: application/json" -d '{"username":"user","password":"pass"}'
 ```
