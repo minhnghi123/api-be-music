@@ -28,8 +28,8 @@ router.get(
     }
   }
 );
-router.get("/login", controller.login);
-router.get("/sign-up", controller.signup);
+// router.get("/login", controller.login);
+// router.get("/sign-up", controller.signup);
 router.post("/sign-up", authSignUp, controller.signupPost);
 router.post("/login", controller.loginPost);
 router.post("/logout", controller.logout);

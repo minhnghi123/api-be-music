@@ -23,8 +23,9 @@ export async function loginPost(req: Request, res: Response) {
   try {
     const { username, password } = req.body;
     if (!username || !password) {
-      res.redirect("back");
-      return;
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing username or password" });
     }
     const user = await User.findOne({
       username: username,
@@ -32,47 +33,55 @@ export async function loginPost(req: Request, res: Response) {
       status: "active",
     });
     if (!user) {
-      res.redirect("back");
-      return;
+      return res
+        .status(401)
+        .json({ success: false, message: "User not found or inactive" });
     }
     const isPasswordMatch = await bcryptjs.compare(
       password,
       String(user.password)
     );
     if (!isPasswordMatch) {
-      res.redirect("back");
-      return;
+      return res
+        .status(401)
+        .json({ success: false, message: "Incorrect password" });
     }
     generateTokenAndSetToken(String(user._id), res); //jwt
-    res.redirect("/");
+    return res.status(200).json({ success: true, message: "Login successful" });
   } catch (error) {
-    res.status(400).json({
-      code: 400,
-      message: "Internal server error",
-    });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 }
 
 export async function signupPost(req: Request, res: Response) {
   try {
     const { username, email, password, rePassword } = req.body;
+    if (!username || !email || !password || !rePassword) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing required fields" });
+    }
+    if (password !== rePassword) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Passwords do not match" });
+    }
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) {
+      return res
+        .status(409)
+        .json({ success: false, message: "Username or email already exists" });
+    }
     const salt = bcryptjs.genSaltSync(10);
     const hashedPassword = await bcryptjs.hash(password, salt);
-    const newUser = new User({
-      username,
-      email,
-      password: hashedPassword,
-    });
-    if (newUser) {
-      await newUser.save();
-      generateTokenAndSetToken(String(newUser._id), res); //jwt
-    } else {
-      res.redirect("back");
-      return;
-    }
-    res.redirect("/auth/login");
+    const newUser = new User({ username, email, password: hashedPassword });
+    await newUser.save();
+    generateTokenAndSetToken(String(newUser._id), res); //jwt
+    return res
+      .status(201)
+      .json({ success: true, message: "Signup successful" });
   } catch (error) {
-    console.error(error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 }
 
@@ -80,12 +89,9 @@ export async function logout(req: Request, res: Response) {
   try {
     res.clearCookie("jwt-token");
     res.locals.user = null;
-    res.status(200).json({
-      code: 200,
-      message: "Logout successfully",
-    }); // });
+    res.status(200).json({ success: true, message: "Logout successfully" });
   } catch (error) {
-    res.status(400).json({ code: 400, message: "Internal server error" });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 }
 // export async function forgotPost(req:Request, res:Response) {

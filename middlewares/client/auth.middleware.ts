@@ -8,16 +8,20 @@ export const authSignUp = async (
 ) => {
   const { username, email, password, rePassword } = req.body;
   if (!username || !email || !password) {
-    res.redirect("back");
-    return;
+    return res
+      .status(400)
+      .json({ success: false, message: "Missing required fields" });
   }
   if (password.length < 6) {
-    res.redirect("back");
-    return;
+    return res.status(400).json({
+      success: false,
+      message: "Password must be at least 6 characters",
+    });
   }
   if (password !== rePassword) {
-    res.redirect("back");
-    return;
+    return res
+      .status(400)
+      .json({ success: false, message: "Passwords do not match" });
   }
   const existingUserByEmail = await User.findOne({
     email: email,
@@ -30,12 +34,14 @@ export const authSignUp = async (
     status: "active",
   });
   if (existingUserByEmail) {
-    res.redirect("back");
-    return;
+    return res
+      .status(409)
+      .json({ success: false, message: "Email already exists" });
   }
   if (existingUserByUsername) {
-    res.redirect("back");
-    return;
+    return res
+      .status(409)
+      .json({ success: false, message: "Username already exists" });
   }
   next();
 };

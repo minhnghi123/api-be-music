@@ -31,8 +31,9 @@ export function loginPost(req, res) {
         try {
             const { username, password } = req.body;
             if (!username || !password) {
-                res.redirect("back");
-                return;
+                return res
+                    .status(400)
+                    .json({ success: false, message: "Missing username or password" });
             }
             const user = yield User.findOne({
                 username: username,
@@ -40,22 +41,21 @@ export function loginPost(req, res) {
                 status: "active",
             });
             if (!user) {
-                res.redirect("back");
-                return;
+                return res
+                    .status(401)
+                    .json({ success: false, message: "User not found or inactive" });
             }
             const isPasswordMatch = yield bcryptjs.compare(password, String(user.password));
             if (!isPasswordMatch) {
-                res.redirect("back");
-                return;
+                return res
+                    .status(401)
+                    .json({ success: false, message: "Incorrect password" });
             }
             generateTokenAndSetToken(String(user._id), res);
-            res.redirect("/");
+            return res.status(200).json({ success: true, message: "Login successful" });
         }
         catch (error) {
-            res.status(400).json({
-                code: 400,
-                message: "Internal server error",
-            });
+            res.status(500).json({ success: false, message: "Internal server error" });
         }
     });
 }
@@ -63,25 +63,33 @@ export function signupPost(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { username, email, password, rePassword } = req.body;
+            if (!username || !email || !password || !rePassword) {
+                return res
+                    .status(400)
+                    .json({ success: false, message: "Missing required fields" });
+            }
+            if (password !== rePassword) {
+                return res
+                    .status(400)
+                    .json({ success: false, message: "Passwords do not match" });
+            }
+            const existingUser = yield User.findOne({ $or: [{ username }, { email }] });
+            if (existingUser) {
+                return res
+                    .status(409)
+                    .json({ success: false, message: "Username or email already exists" });
+            }
             const salt = bcryptjs.genSaltSync(10);
             const hashedPassword = yield bcryptjs.hash(password, salt);
-            const newUser = new User({
-                username,
-                email,
-                password: hashedPassword,
-            });
-            if (newUser) {
-                yield newUser.save();
-                generateTokenAndSetToken(String(newUser._id), res);
-            }
-            else {
-                res.redirect("back");
-                return;
-            }
-            res.redirect("/auth/login");
+            const newUser = new User({ username, email, password: hashedPassword });
+            yield newUser.save();
+            generateTokenAndSetToken(String(newUser._id), res);
+            return res
+                .status(201)
+                .json({ success: true, message: "Signup successful" });
         }
         catch (error) {
-            console.error(error);
+            res.status(500).json({ success: false, message: "Internal server error" });
         }
     });
 }
@@ -90,13 +98,10 @@ export function logout(req, res) {
         try {
             res.clearCookie("jwt-token");
             res.locals.user = null;
-            res.status(200).json({
-                code: 200,
-                message: "Logout successfully",
-            });
+            res.status(200).json({ success: true, message: "Logout successfully" });
         }
         catch (error) {
-            res.status(400).json({ code: 400, message: "Internal server error" });
+            res.status(500).json({ success: false, message: "Internal server error" });
         }
     });
 }
