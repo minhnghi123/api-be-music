@@ -846,3 +846,31 @@
 curl -X GET http://localhost:3000/music/songs
 curl -X POST http://localhost:3000/auth/login -H "Content-Type: application/json" -d '{"username":"user","password":"pass"}'
 ```
+
+## Autocomplete
+
+### Gợi ý bài hát theo từ khóa
+
+- **GET** `/autocomplete?q=keyword`
+- **Query param:**
+  - `q`: từ khóa cần gợi ý
+- **Response thành công:**
+
+```json
+{
+  "success": true,
+  "data": [
+    { "title": "string" },
+    ...
+  ]
+}
+```
+
+- **Response lỗi:**
+
+```json
+{
+  "success": false,
+  "message": "Missing or invalid keyword"
+}
+```

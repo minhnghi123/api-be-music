@@ -47,7 +47,6 @@ export const home = async (req: Request, res: Response) => {
         if (user) {
           (playlist as any)["username"] = user.username;
         }
-        // console.log(userIndividualPlaylists);
       }
     }
     //render
@@ -58,26 +57,8 @@ export const home = async (req: Request, res: Response) => {
       favoriteSongIds: favoriteSongIds,
       individualPlaylists: userIndividualPlaylists,
     });
+    return; // Thêm return để không chạy tiếp code phía dưới
   }
-  //end finding logic
-
-  //   const artists = await Artist.find({ status: "active", deleted: false });
-  //   const songs = await Song.find({ status: "active", deleted: false });
-  //   const playlists = await Playlist.find({ status: { $ne: "private" }, deleted: false });
-
-  //   let individualPlaylists = null;
-  //   if (res.locals.user) {
-  //     individualPlaylists = await Playlist.find({
-  //       user_id: userID,
-  //       deleted: false
-  //     });
-  //     for (const playlist of individualPlaylists) {
-  //       const user = await User.findOne({
-  //         _id: playlist.user_id,
-  //         deleted: false
-  //       });
-  //       playlist["username"] = user.username;
-  //     }
 
   const artists = await getFullArtists();
   const songs = await getFullSongs();
@@ -104,16 +85,22 @@ export const home = async (req: Request, res: Response) => {
 };
 
 export const autocomplete = async (req: Request, res: Response) => {
-  const keyword = req.query.q;
-  const result = await Song.find({
-    title: {
-      $regex: keyword,
-      $options: "i",
-    },
-    status: "active",
-    deleted: false,
-  })
-    .select("title")
-    .limit(10);
-  res.json(result);
+  try {
+    const keyword = req.query.q;
+    if (!keyword || typeof keyword !== "string" || keyword.trim() === "") {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing or invalid keyword" });
+    }
+    const result = await Song.find({
+      title: { $regex: keyword, $options: "i" },
+      status: "active",
+      deleted: false,
+    })
+      .select("title")
+      .limit(10);
+    return res.json({ success: true, data: result });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
 };
