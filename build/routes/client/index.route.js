@@ -9,9 +9,9 @@ import artistRoute from "./artist.route.js";
 import { authUserInMainPage } from "../../middlewares/client/auth.middleware.js";
 const routeClient = (app) => {
     app.use("/auth", authRoute);
+    app.use("/music", musicRoute);
     app.use(authUserInMainPage);
     app.use("/", homeRoute);
-    app.use("/music", musicRoute);
     app.use("/favorite-songs", favoriteSongRoute);
     app.use("/playlist", playlistRoute);
     app.use("/topics", topicRoute);
