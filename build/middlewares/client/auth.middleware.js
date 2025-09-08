@@ -52,23 +52,36 @@ export const authSignUp = (req, res, next) => __awaiter(void 0, void 0, void 0, 
 export const authUserInMainPage = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const token = req.cookies["jwt-token"];
-        if (token) {
-            if (process.env.JWT_SECRET) {
-                const verifiedUser = jwt.verify(token, process.env.JWT_SECRET);
-                const user = yield User.findById(verifiedUser.userId.toString());
-                if (!user) {
-                    res.redirect("/auth/login");
-                    return;
-                }
-                res.locals.user = user;
-            }
-            else {
-                throw new Error("JWT_SECRET is not defined");
-            }
+        if (!token) {
+            return res
+                .status(401)
+                .json({ success: false, message: "Authentication token missing" });
         }
+        if (!process.env.JWT_SECRET) {
+            return res
+                .status(500)
+                .json({ success: false, message: "Server configuration error" });
+        }
+        let verifiedUser;
+        try {
+            verifiedUser = jwt.verify(token, process.env.JWT_SECRET);
+        }
+        catch (err) {
+            return res
+                .status(401)
+                .json({ success: false, message: "Invalid or expired token" });
+        }
+        const user = yield User.findById(verifiedUser.userId);
+        if (!user) {
+            return res
+                .status(401)
+                .json({ success: false, message: "User not found" });
+        }
+        res.locals.user = user;
         next();
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal server error" });
     }
 });

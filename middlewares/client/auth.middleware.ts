@@ -52,30 +52,41 @@ export const authUserInMainPage = async (
 ) => {
   try {
     const token = req.cookies["jwt-token"];
-
-    // console.log("test token ");
-    if (token) {
-      if (process.env.JWT_SECRET) {
-        const verifiedUser = jwt.verify(token, process.env.JWT_SECRET);
-        // console.log(verifiedUser);=> decode to registered userId , iat and exp
-        //=>get userId to check in DB
-        const user = await User.findById(
-          (verifiedUser as jwt.JwtPayload).userId.toString()
-        );
-        if (!user) {
-          res.redirect("/auth/login");
-          return;
-        }
-        res.locals.user = user;
-      } else {
-        throw new Error("JWT_SECRET is not defined");
-      }
+    if (!token) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Authentication token missing" });
     }
-    //  else {
-    //   res.locals.user = null;
-    // }
+
+    if (!process.env.JWT_SECRET) {
+      return res
+        .status(500)
+        .json({ success: false, message: "Server configuration error" });
+    }
+
+    let verifiedUser;
+    try {
+      verifiedUser = jwt.verify(
+        token,
+        process.env.JWT_SECRET
+      ) as jwt.JwtPayload;
+    } catch (err) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid or expired token" });
+    }
+
+    const user = await User.findById(verifiedUser.userId);
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "User not found" });
+    }
+
+    res.locals.user = user;
     next();
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

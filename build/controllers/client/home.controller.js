@@ -54,6 +54,7 @@ export const home = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             favoriteSongIds: favoriteSongIds,
             individualPlaylists: userIndividualPlaylists,
         });
+        return;
     }
     const artists = yield getFullArtists();
     const songs = yield getFullSongs();
@@ -77,16 +78,23 @@ export const home = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     });
 });
 export const autocomplete = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const keyword = req.query.q;
-    const result = yield Song.find({
-        title: {
-            $regex: keyword,
-            $options: "i",
-        },
-        status: "active",
-        deleted: false,
-    })
-        .select("title")
-        .limit(10);
-    res.json(result);
+    try {
+        const keyword = req.query.q;
+        if (!keyword || typeof keyword !== "string" || keyword.trim() === "") {
+            return res
+                .status(400)
+                .json({ success: false, message: "Missing or invalid keyword" });
+        }
+        const result = yield Song.find({
+            title: { $regex: keyword, $options: "i" },
+            status: "active",
+            deleted: false,
+        })
+            .select("title")
+            .limit(10);
+        return res.json({ success: true, data: result });
+    }
+    catch (err) {
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
 });
