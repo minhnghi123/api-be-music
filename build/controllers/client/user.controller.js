@@ -14,6 +14,7 @@ import User from "../../models/user.model.js";
 import { getPlaylistOfUser } from "../../utils/client/getPlaylist.util.js";
 import { getFavoriteSongOfUser } from "../../utils/client/getFavoriteSong.util.js";
 import bcryptjs from "bcryptjs";
+import { streamUpload } from "../../helpers/cloudinary.helper.js";
 export const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId } = req.params;
@@ -113,7 +114,14 @@ export const updateMe = (req, res) => __awaiter(void 0, void 0, void 0, function
         if (!userId) {
             return res.status(401).json({ success: false, message: "Unauthorized" });
         }
-        const { username, email, avatar } = req.body;
+        const { username, email } = req.body;
+        let avatar = req.body.avatar;
+        if (req.file && req.file.buffer) {
+            const result = yield streamUpload(req.file.buffer);
+            if (result && typeof result === "object" && "url" in result) {
+                avatar = result.url;
+            }
+        }
         const update = {};
         if (username)
             update.username = username;
