@@ -7,6 +7,7 @@ import User from "../../models/user.model.js";
 import { getPlaylistOfUser } from "../../utils/client/getPlaylist.util.js";
 import { getFavoriteSongOfUser } from "../../utils/client/getFavoriteSong.util.js";
 import bcryptjs from "bcryptjs";
+import { streamUpload } from "../../helpers/cloudinary.helper.js";
 
 export const index = async (req: Request, res: Response) => {
   try {
@@ -122,7 +123,15 @@ export const updateMe = async (req: Request, res: Response) => {
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
-    const { username, email, avatar } = req.body;
+    const { username, email } = req.body;
+    let avatar = req.body.avatar;
+    // Nếu có file upload, upload lên Cloudinary
+    if (req.file && req.file.buffer) {
+      const result: any = await streamUpload(req.file.buffer);
+      if (result && typeof result === "object" && "url" in result) {
+        avatar = result.url;
+      }
+    }
     const update: any = {};
     if (username) update.username = username;
     if (email) update.email = email;
