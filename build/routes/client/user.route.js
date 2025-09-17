@@ -9,4 +9,5 @@ router.get("/me", controller.getMe);
 router.put("/me", upload.single("avatar"), uploadSingle, controller.updateMe);
 router.put("/me/change-password", controller.changePassword);
 router.delete("/me", controller.deleteMe);
+router.get("/me/playlists", controller.getMyPlaylists);
 export default router;

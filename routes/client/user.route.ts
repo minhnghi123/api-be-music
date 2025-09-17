@@ -11,4 +11,7 @@ router.put("/me", upload.single("avatar"), uploadSingle, controller.updateMe);
 router.put("/me/change-password", controller.changePassword);
 router.delete("/me", controller.deleteMe);
 
+// Lấy tất cả playlist của account hiện tại (dựa vào token)
+router.get("/me/playlists", controller.getMyPlaylists);
+
 export default router;

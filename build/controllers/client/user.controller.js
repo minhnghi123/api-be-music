@@ -211,3 +211,17 @@ export const deleteMe = (req, res) => __awaiter(void 0, void 0, void 0, function
             .json({ success: false, message: "Internal Server Error" });
     }
 });
+export const getMyPlaylists = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const userId = (_a = res.locals.user) === null || _a === void 0 ? void 0 : _a.id;
+        if (!userId) {
+            return res.status(401).json({ success: false, message: "Unauthorized" });
+        }
+        const playlists = yield getPlaylistOfUser(userId);
+        res.json({ success: true, data: playlists });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+});
