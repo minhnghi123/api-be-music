@@ -6,6 +6,7 @@ import {
   createSong,
   updateSong,
   deleteSong,
+  getRandomSong,
   getAllArtists,
   getArtistById,
   createArtist,
@@ -36,6 +37,7 @@ router.get("/songs/:id", getSongById);
 router.post("/songs", createSong);
 router.put("/songs/:id", updateSong);
 router.delete("/songs/:id", deleteSong);
+router.get("/random", getRandomSong);
 
 // Artist CRUD
 router.get("/artists", getAllArtists);
