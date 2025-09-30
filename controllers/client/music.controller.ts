@@ -99,6 +99,41 @@ export const deleteSong = async (req: Request, res: Response) => {
   }
 };
 
+// Get a random song
+export const getRandomSong = async (req: Request, res: Response) => {
+  try {
+    const count = parseInt(req.query.count as string) || 10; // mặc định 10 bài
+
+    // Lấy random bài hát (chỉ những bài active, chưa xoá)
+    const songs = await Song.aggregate([
+      { $match: { deleted: false, status: "active" } },
+      { $sample: { size: count } },
+    ]);
+
+    // Map artistId -> thông tin artist chi tiết
+    const populatedSongs = await Promise.all(
+      songs.map(async (song) => {
+        const artistInfo = await mapArtistIdToInfo(song.artist);
+        return {
+          ...song,
+          artist: artistInfo,
+        };
+      })
+    );
+
+    res.status(200).json({
+      success: true,
+      data: populatedSongs,
+    });
+  } catch (error) {
+    console.error("Error getRandomSongs:", error);
+    res.status(500).json({
+      success: false,
+      message: "Lỗi server khi lấy gợi ý bài hát",
+    });
+  }
+};
+
 // Get all artists
 export const getAllArtists = async (req: Request, res: Response) => {
   try {
