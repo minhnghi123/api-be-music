@@ -4,6 +4,7 @@ import Topic from "../../models/topic.model.js";
 import Song from "../../models/song.model.js";
 import Artist from "../../models/artist.model.js";
 import User from "../../models/user.model.js";
+import Playlist from "../../models/playlist.model.js";
 import { getPlaylistOfUser } from "../../utils/client/getPlaylist.util.js";
 import { getFavoriteSongOfUser } from "../../utils/client/getFavoriteSong.util.js";
 import bcryptjs from "bcryptjs";
@@ -98,17 +99,34 @@ export const getMe = async (req: Request, res: Response) => {
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
+
     const user = await User.findOne({
       _id: userId,
       deleted: false,
       status: "active",
-    }).select("username email avatar playlist follow_songs follow_artists");
+    })
+      .select("username email avatar follow_songs follow_artists")
+      .lean();
+
     if (!user) {
       return res
         .status(404)
         .json({ success: false, message: "User not found" });
     }
-    return res.json({ success: true, data: user });
+
+    // Lấy full thông tin playlist của user
+    const playlists = await Playlist.find({
+      user_id: userId,
+      deleted: false,
+    });
+
+    return res.json({
+      success: true,
+      data: {
+        ...user,
+        playlists: playlists,
+      },
+    });
   } catch (error) {
     return res
       .status(500)

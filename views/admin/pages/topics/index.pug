@@ -1,48 +1,162 @@
 extends ../../layouts/default.pug
 
 block main
-    h1 #{pageTitle}
-    .d-flex.justify-content-end.mb-3
-        a(
-            href=`/${prefixAdmin}/topics/create`
-            class="btn btn-success"
-            ) + Thêm mới Thêm chủ đề bài hát
+  .topics-management-page
+    // Page Header
+    .page-header.mb-4
+      h1.page-title.fade-in-up
+        i.fas.fa-tags.me-3
+        | Topics Management
+      p.page-subtitle.text-muted.fade-in-up Organize your music content with categories and topics
+    
+    // Action Bar
+    .action-bar.mb-4
+      .row.align-items-center
+        .col-md-6
+          .d-flex.align-items-center
+            .search-box.me-3
+              .input-group
+                input.form-control(type="text", placeholder="Search topics...", name="search")
+                button.btn.btn-outline-primary(type="button")
+                  i.fas.fa-search
+            .filter-dropdown
+              select.form-select
+                option(value="") All Status
+                option(value="active") Active
+                option(value="inactive") Inactive
+        .col-md-6
+          .d-flex.justify-content-end
+            a.btn.btn-primary(href=`/${prefixAdmin}/topics/create`)
+              i.fas.fa-plus.me-2
+              | Add New Topic
+    
+    // Stats Cards
+    .row.mb-4
+      .col-xl-3.col-md-6.mb-3
+        .stats-card.bg-gradient-primary
+          .d-flex.justify-content-between.align-items-center
+            .stats-content
+              .stats-number #{topics ? topics.length : 0}
+              .stats-label Total Topics
+            .stats-icon
+              i.fas.fa-tags
+      
+      .col-xl-3.col-md-6.mb-3
+        .stats-card.bg-gradient-success
+          .d-flex.justify-content-between.align-items-center
+            .stats-content
+              .stats-number #{topics ? topics.filter(topic => topic.status === 'active').length : 0}
+              .stats-label Active Topics
+            .stats-icon
+              i.fas.fa-check-circle
+      
+      .col-xl-3.col-md-6.mb-3
+        .stats-card.bg-gradient-warning
+          .d-flex.justify-content-between.align-items-center
+            .stats-content
+              .stats-number #{topics ? topics.reduce((total, topic) => total + (topic.songCount || 0), 0) : 0}
+              .stats-label Total Songs
+            .stats-icon
+              i.fas.fa-music
+      
+      .col-xl-3.col-md-6.mb-3
+        .stats-card.bg-gradient-info
+          .d-flex.justify-content-between.align-items-center
+            .stats-content
+              .stats-number #{topics ? Math.round(topics.reduce((total, topic) => total + (topic.songCount || 0), 0) / topics.length) : 0}
+              .stats-label Avg Songs/Topic
+            .stats-icon
+              i.fas.fa-chart-bar
+    
+    // Topics Grid
+    .row
+      if topics && topics.length > 0
+        each topic, index in topics
+          .col-xl-4.col-lg-6.mb-4
+            .card.topic-card.h-100
+              .card-img-top.position-relative
+                img.img-fluid(src=topic.imgTopic || "/src/electronic.jpg", alt=topic.title, style="height: 200px; object-fit: cover;")
+                .topic-overlay
+                  .topic-actions
+                    a.btn.btn-sm.btn-light.me-2(href=`/${prefixAdmin}/topics/view/${topic.id}`)
+                      i.fas.fa-eye
+                    a.btn.btn-sm.btn-warning.me-2(href=`/${prefixAdmin}/topics/edit/${topic.id}`)
+                      i.fas.fa-edit
+                    button.btn.btn-sm.btn-danger(data-bs-toggle="modal", data-bs-target="#deleteModal", data-topic-id=topic.id, data-topic-title=topic.title)
+                      i.fas.fa-trash
+                .topic-status
+                  if topic.status === 'active'
+                    span.badge.bg-success Active
+                  else
+                    span.badge.bg-secondary Inactive
+              
+              .card-body
+                h5.card-title #{topic.title}
+                p.card-text.text-muted #{topic.content ? topic.content.substring(0, 100) + '...' : 'No description available'}
+                
+                .topic-stats.mt-3
+                  .row.text-center
+                    .col-4
+                      .stat-item
+                        .stat-number #{topic.songCount || 0}
+                        .stat-label Songs
+                    .col-4
+                      .stat-item
+                        .stat-number #{topic.playCount || 0}
+                        .stat-label Plays
+                    .col-4
+                      .stat-item
+                        .stat-number #{topic.likeCount || 0}
+                        .stat-label Likes
+              
+              .card-footer.bg-transparent
+                .d-flex.justify-content-between.align-items-center
+                  .topic-meta
+                    small.text-muted
+                      i.fas.fa-calendar.me-1
+                      | Created #{new Date(topic.createdAt || Date.now()).toLocaleDateString()}
+                  .topic-actions-footer
+                    a.btn.btn-outline-primary.btn-sm(href=`/${prefixAdmin}/topics/view/${topic.id}`)
+                      i.fas.fa-eye.me-1
+                      | View
+      else
+        .col-12
+          .empty-state.text-center.py-5
+            i.fas.fa-tags.fs-1.text-muted.mb-3
+            h5.text-muted No topics found
+            p.text-muted Get started by creating your first topic category.
+            a.btn.btn-primary(href=`/${prefixAdmin}/topics/create`)
+              i.fas.fa-plus.me-2
+              | Create Topic
 
-    //- Search and Filter Form
-    .d-flex.justify-content-between.mb-3.search-form
-        form.d-flex.align-items-center
-            input.form-control.me-2(type="text", placeholder="Tìm kiếm bài hát...", name="search")
-            button.btn.btn-primary(type="submit") Tìm kiếm
+  // Delete Confirmation Modal
+  .modal.fade#deleteModal(tabindex="-1")
+    .modal-dialog
+      .modal-content
+        .modal-header.bg-danger.text-white
+          h5.modal-title
+            i.fas.fa-exclamation-triangle.me-2
+            | Confirm Deletion
+          button.btn-close.btn-close-white(type="button", data-bs-dismiss="modal")
+        .modal-body
+          p Are you sure you want to delete topic 
+            strong#deleteTopicTitle
+            | ? This action cannot be undone and will affect all associated songs.
+        .modal-footer
+          button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Cancel
+          button.btn.btn-danger#confirmDelete
+            i.fas.fa-trash.me-2
+            | Delete Topic
 
-    .table-responsive
-        table.table.table-striped.table-bordered
-            thead.table-primary
-                tr
-                    th Số thứ tự
-                    th Tiêu đề
-                    th Hình ảnh
-                    th Nội dung
-                    th Hành động
-            tbody 
-                each topic, idx in topics
-                    tr
-                        td #{idx + 1}
-                        td #{topic.title}
-                        td 
-                            img(src=topic.imgTopic, alt=`${topic.title}`, width="100")
-                        td #{topic.content}     
-                        td 
-                            .action-container
-                                span.action-toggle 
-                                .action-buttons.hidden
-                                    a(href=`/${prefixAdmin}/topics/edit/${topic.id}`) 
-                                        button.btn.btn-warning.edit-btn(
-                                    ) Sửa
-                                    button.btn.btn-danger.delete-btn(
-                                        data-bs-toggle="modal", 
-                                        data-bs-target="#deleteTopicModal"
-                                        data-path=`/${prefixAdmin}/topics/delete/${topic.id}`
-                                        deleted-topic-button
-                                        ) Xóa
-
-    include ../../partials/deleted-topic-modal.pug
+  script.
+    // Delete confirmation
+    document.getElementById('deleteModal').addEventListener('show.bs.modal', function (event) {
+      const button = event.relatedTarget;
+      const topicId = button.getAttribute('data-topic-id');
+      const topicTitle = button.getAttribute('data-topic-title');
+      
+      document.getElementById('deleteTopicTitle').textContent = topicTitle;
+      document.getElementById('confirmDelete').onclick = function() {
+        window.location.href = `/${prefixAdmin}/topics/delete/${topicId}`;
+      };
+    });
