@@ -94,6 +94,30 @@ export const deleteSong = (req, res) => __awaiter(void 0, void 0, void 0, functi
             .json({ success: false, message: "Server error", error: err });
     }
 });
+export const getRandomSong = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const count = parseInt(req.query.count) || 10;
+        const songs = yield Song.aggregate([
+            { $match: { deleted: false, status: "active" } },
+            { $sample: { size: count } },
+        ]);
+        const populatedSongs = yield Promise.all(songs.map((song) => __awaiter(void 0, void 0, void 0, function* () {
+            const artistInfo = yield mapArtistIdToInfo(song.artist);
+            return Object.assign(Object.assign({}, song), { artist: artistInfo });
+        })));
+        res.status(200).json({
+            success: true,
+            data: populatedSongs,
+        });
+    }
+    catch (error) {
+        console.error("Error getRandomSongs:", error);
+        res.status(500).json({
+            success: false,
+            message: "Lỗi server khi lấy gợi ý bài hát",
+        });
+    }
+});
 export const getAllArtists = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const artists = yield Artist.find({ deleted: false, status: "active" });

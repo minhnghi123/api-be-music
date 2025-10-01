@@ -1,11 +1,12 @@
 import express from "express";
 const router = express.Router();
-import { getAllSongs, getSongById, createSong, updateSong, deleteSong, getAllArtists, getArtistById, createArtist, updateArtist, deleteArtist, getAllPlaylists, getPlaylistById, createPlaylist, updatePlaylist, deletePlaylist, getAllTopics, getTopicById, createTopic, updateTopic, deleteTopic, getAllUsers, getUserById, createUser, updateUser, deleteUser, } from "../../controllers/client/music.controller.js";
+import { getAllSongs, getSongById, createSong, updateSong, deleteSong, getRandomSong, getAllArtists, getArtistById, createArtist, updateArtist, deleteArtist, getAllPlaylists, getPlaylistById, createPlaylist, updatePlaylist, deletePlaylist, getAllTopics, getTopicById, createTopic, updateTopic, deleteTopic, getAllUsers, getUserById, createUser, updateUser, deleteUser, } from "../../controllers/client/music.controller.js";
 router.get("/songs", getAllSongs);
 router.get("/songs/:id", getSongById);
 router.post("/songs", createSong);
 router.put("/songs/:id", updateSong);
 router.delete("/songs/:id", deleteSong);
+router.get("/random", getRandomSong);
 router.get("/artists", getAllArtists);
 router.get("/artists/:id", getArtistById);
 router.post("/artists", createArtist);
