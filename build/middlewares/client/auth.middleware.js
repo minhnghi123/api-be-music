@@ -49,13 +49,13 @@ export const authSignUp = (req, res, next) => __awaiter(void 0, void 0, void 0, 
     }
     next();
 });
-export const authUserInMainPage = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+export const requireAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const token = req.cookies["jwt-token"];
         if (!token) {
             return res
                 .status(401)
-                .json({ success: false, message: "Authentication token missing" });
+                .json({ success: false, message: "Authentication required" });
         }
         if (!process.env.JWT_SECRET) {
             return res
@@ -83,5 +83,29 @@ export const authUserInMainPage = (req, res, next) => __awaiter(void 0, void 0, 
     catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: "Internal server error" });
+    }
+});
+export const optionalAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const token = req.cookies["jwt-token"];
+        if (!token) {
+            return next();
+        }
+        if (!process.env.JWT_SECRET) {
+            return next();
+        }
+        try {
+            const verifiedUser = jwt.verify(token, process.env.JWT_SECRET);
+            const user = yield User.findById(verifiedUser.userId);
+            if (user) {
+                res.locals.user = user;
+            }
+        }
+        catch (err) {
+        }
+        next();
+    }
+    catch (error) {
+        next();
     }
 });

@@ -45,7 +45,7 @@ export const authSignUp = async (
   }
   next();
 };
-export const authUserInMainPage = async (
+export const requireAuth = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -55,7 +55,7 @@ export const authUserInMainPage = async (
     if (!token) {
       return res
         .status(401)
-        .json({ success: false, message: "Authentication token missing" });
+        .json({ success: false, message: "Authentication required" });
     }
 
     if (!process.env.JWT_SECRET) {
@@ -88,5 +88,39 @@ export const authUserInMainPage = async (
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+export const optionalAuth = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const token = req.cookies["jwt-token"];
+    if (!token) {
+      return next(); // Không có token thì vẫn cho qua
+    }
+
+    if (!process.env.JWT_SECRET) {
+      return next();
+    }
+
+    try {
+      const verifiedUser = jwt.verify(
+        token,
+        process.env.JWT_SECRET
+      ) as jwt.JwtPayload;
+
+      const user = await User.findById(verifiedUser.userId);
+      if (user) {
+        res.locals.user = user;
+      }
+    } catch (err) {
+      // Token không hợp lệ, bỏ qua
+    }
+
+    next();
+  } catch (error) {
+    next();
   }
 };

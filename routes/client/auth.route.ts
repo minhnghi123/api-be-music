@@ -5,7 +5,7 @@ import * as controller from "../../controllers/client/auth.controller.js";
 import { authSignUp } from "../../middlewares/client/auth.middleware.js";
 import { googleConfig } from "../../config/OAUTH2/google.config.js";
 import { generateTokenAndSetToken } from "../../helpers/JWT.helper.js";
-import { authUserInMainPage } from "../../middlewares/client/auth.middleware.js";
+
 googleConfig();
 router.get(
   "/google",

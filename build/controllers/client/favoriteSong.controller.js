@@ -9,92 +9,190 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import FavoriteSong from "../../models/favorite_song.model.js";
 import Song from "../../models/song.model.js";
-import Artist from "../../models/artist.model.js";
-export const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+import { mapArtistIdToInfo } from "../../utils/client/mapArtistIdToInfo.util.js";
+export const getAllFavoriteSongs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
-        const id = (_a = res.locals.user) === null || _a === void 0 ? void 0 : _a.id;
-        if (id) {
-            const favoriteSongs = yield FavoriteSong.find({
-                user_id: id,
-                deleted: false,
-            }).select("song_id");
-            const songs = [];
-            for (const favoriteSong of favoriteSongs) {
-                const song = yield Song.findOne({
-                    _id: favoriteSong.song_id,
-                    deleted: false,
-                });
-                songs.push(song);
-            }
-            for (const song of songs) {
-                if (!song)
-                    continue;
-                const artist = yield Artist.findOne({
-                    _id: song.artist,
-                    deleted: false,
-                }).select("fullName");
-                if (!artist) {
-                    song.artist = "Không tìm thấy thông tin nghệ sĩ";
-                }
-                else {
-                    song.artist = artist.fullName;
-                }
-            }
-            const favoriteSongIds = favoriteSongs.map((item) => item.song_id.toString());
-            res.json({
-                success: true,
-                songs,
+        const userId = (_a = res.locals.user) === null || _a === void 0 ? void 0 : _a.id;
+        if (!userId) {
+            return res.status(401).json({ success: false, message: "Unauthorized" });
+        }
+        const favoriteSongs = yield FavoriteSong.find({
+            user_id: userId,
+            deleted: false,
+        }).select("song_id");
+        const songIds = favoriteSongs.map((item) => item.song_id);
+        let songs = yield Song.find({
+            _id: { $in: songIds },
+            deleted: false,
+            status: "active",
+        });
+        const songsWithArtist = yield Promise.all(songs.map((song) => __awaiter(void 0, void 0, void 0, function* () {
+            const songObj = song.toObject();
+            const artistInfo = yield mapArtistIdToInfo(song.artist);
+            songObj.artist = artistInfo || "Unknown Artist";
+            return songObj;
+        })));
+        const favoriteSongIds = favoriteSongs.map((item) => item.song_id.toString());
+        return res.json({
+            success: true,
+            data: {
+                songs: songsWithArtist,
                 favoriteSongIds,
-            });
-        }
-        else {
-            res.redirect("/auth/login");
-        }
+                total: songsWithArtist.length,
+            },
+        });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
+        return res
+            .status(500)
+            .json({ success: false, message: "Internal Server Error" });
+    }
+});
+export const index = getAllFavoriteSongs;
+export const getFavoriteSongById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const userId = (_a = res.locals.user) === null || _a === void 0 ? void 0 : _a.id;
+        const songId = req.params.id;
+        if (!userId) {
+            return res.status(401).json({ success: false, message: "Unauthorized" });
+        }
+        const favoriteSong = yield FavoriteSong.findOne({
+            user_id: userId,
+            song_id: songId,
+            deleted: false,
+        });
+        if (!favoriteSong) {
+            return res
+                .status(404)
+                .json({ success: false, message: "Favorite song not found" });
+        }
+        const song = yield Song.findOne({
+            _id: songId,
+            deleted: false,
+            status: "active",
+        });
+        if (!song) {
+            return res
+                .status(404)
+                .json({ success: false, message: "Song not found" });
+        }
+        const songObj = song.toObject();
+        const artistInfo = yield mapArtistIdToInfo(song.artist);
+        songObj.artist = artistInfo || "Unknown Artist";
+        return res.json({ success: true, data: songObj });
+    }
+    catch (error) {
+        console.error(error);
+        return res
+            .status(500)
+            .json({ success: false, message: "Internal Server Error" });
     }
 });
 export const addFavoriteSong = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
-        const id = req.params.id;
-        const userID = (_a = res.locals.user) === null || _a === void 0 ? void 0 : _a.id;
-        if (userID) {
-            const favoriteSong = yield FavoriteSong.findOne({ song_id: id });
-            if (favoriteSong) {
-                if (favoriteSong.deleted === true) {
-                    yield FavoriteSong.updateOne({ song_id: id }, {
-                        user_id: userID,
-                        deleted: false,
-                        removed_at: null,
-                    });
-                    res.json({ code: "success" });
-                }
-                else {
-                    yield FavoriteSong.updateOne({ song_id: id }, {
-                        deleted: true,
-                        removed_at: new Date(),
-                    });
-                    res.json({ code: "remove" });
-                }
+        const songId = req.params.id;
+        const userId = (_a = res.locals.user) === null || _a === void 0 ? void 0 : _a.id;
+        if (!userId) {
+            return res.status(401).json({ success: false, message: "Unauthorized" });
+        }
+        const song = yield Song.findOne({
+            _id: songId,
+            deleted: false,
+            status: "active",
+        });
+        if (!song) {
+            return res
+                .status(404)
+                .json({ success: false, message: "Song not found" });
+        }
+        const existingFavorite = yield FavoriteSong.findOne({
+            user_id: userId,
+            song_id: songId,
+        });
+        if (existingFavorite) {
+            if (existingFavorite.deleted) {
+                yield FavoriteSong.updateOne({ _id: existingFavorite._id }, { deleted: false, removed_at: null });
+                return res.json({
+                    success: true,
+                    message: "Added to favorites",
+                    action: "added",
+                });
             }
             else {
-                const record = new FavoriteSong({
-                    user_id: res.locals.user.id,
-                    song_id: id,
+                yield FavoriteSong.updateOne({ _id: existingFavorite._id }, { deleted: true, removed_at: new Date() });
+                return res.json({
+                    success: true,
+                    message: "Removed from favorites",
+                    action: "removed",
                 });
-                yield record.save();
-                res.json({ code: "success" });
             }
         }
         else {
-            res.status(401).json({ success: false, message: "Unauthorized" });
+            const newFavorite = new FavoriteSong({
+                user_id: userId,
+                song_id: songId,
+            });
+            yield newFavorite.save();
+            return res.json({
+                success: true,
+                message: "Added to favorites",
+                action: "added",
+            });
         }
     }
     catch (error) {
-        console.log(error);
-        res.json({ code: "error" });
+        console.error(error);
+        return res
+            .status(500)
+            .json({ success: false, message: "Internal Server Error" });
+    }
+});
+export const removeFavoriteSong = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const songId = req.params.id;
+        const userId = (_a = res.locals.user) === null || _a === void 0 ? void 0 : _a.id;
+        if (!userId) {
+            return res.status(401).json({ success: false, message: "Unauthorized" });
+        }
+        const favoriteSong = yield FavoriteSong.findOne({
+            user_id: userId,
+            song_id: songId,
+            deleted: false,
+        });
+        if (!favoriteSong) {
+            return res
+                .status(404)
+                .json({ success: false, message: "Favorite song not found" });
+        }
+        yield FavoriteSong.updateOne({ _id: favoriteSong._id }, { deleted: true, removed_at: new Date() });
+        return res.json({ success: true, message: "Removed from favorites" });
+    }
+    catch (error) {
+        console.error(error);
+        return res
+            .status(500)
+            .json({ success: false, message: "Internal Server Error" });
+    }
+});
+export const removeAllFavoriteSongs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const userId = (_a = res.locals.user) === null || _a === void 0 ? void 0 : _a.id;
+        if (!userId) {
+            return res.status(401).json({ success: false, message: "Unauthorized" });
+        }
+        yield FavoriteSong.updateMany({ user_id: userId, deleted: false }, { deleted: true, removed_at: new Date() });
+        return res.json({ success: true, message: "All favorite songs removed" });
+    }
+    catch (error) {
+        console.error(error);
+        return res
+            .status(500)
+            .json({ success: false, message: "Internal Server Error" });
     }
 });
