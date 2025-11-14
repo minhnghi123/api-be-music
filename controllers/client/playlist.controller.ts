@@ -14,7 +14,7 @@ export const index = async (req: Request, res: Response) => {
       $in: playlist?.songs,
     },
   })
-    .select("title fileUrl coverImage artist")
+    .select("title fileUrl coverImage artist lyrics")
     .populate({
       path: "artist",
       match: { status: "active", deleted: false },

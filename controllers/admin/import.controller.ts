@@ -69,7 +69,8 @@ export const importArtistFromSpotify = async (req: Request, res: Response) => {
     if (!topic) {
       topic = new Topic({
         title: topicName,
-        imgTopic: spotifyArtist.images[0]?.url || "https://via.placeholder.com/300",
+        imgTopic:
+          spotifyArtist.images[0]?.url || "https://via.placeholder.com/300",
         content: `Thể loại ${topicName}`,
       });
       await topic.save();
@@ -78,9 +79,7 @@ export const importArtistFromSpotify = async (req: Request, res: Response) => {
 
     // Lấy top tracks
     console.log(`📦 Đang lấy bài hát phổ biến...`);
-    const topTracks = await spotifyService.getArtistTopTracks(
-      spotifyArtist.id
-    );
+    const topTracks = await spotifyService.getArtistTopTracks(spotifyArtist.id);
 
     for (const track of topTracks) {
       try {
@@ -202,7 +201,8 @@ export const importArtistFromSpotify = async (req: Request, res: Response) => {
                 album: album.name,
                 topic: [topic._id.toString()],
                 fileUrl:
-                  trackDetails.preview_url || trackDetails.external_urls.spotify,
+                  trackDetails.preview_url ||
+                  trackDetails.external_urls.spotify,
                 coverImage: album.images[0]?.url || "",
                 lyrics: "",
                 description: `Album: ${album.name}. Release: ${album.release_date}`,
@@ -212,7 +212,9 @@ export const importArtistFromSpotify = async (req: Request, res: Response) => {
               await newSong.save();
               importedSongs.push({
                 title: track.name,
-                artists: trackDetails.artists.map((a: any) => a.name).join(", "),
+                artists: trackDetails.artists
+                  .map((a: any) => a.name)
+                  .join(", "),
                 album: album.name,
               });
               console.log(`  ✅ Import: ${track.name}`);
@@ -312,7 +314,8 @@ export const importMultipleArtists = async (req: Request, res: Response) => {
         if (!topic) {
           topic = new Topic({
             title: topicName,
-            imgTopic: spotifyArtist.images[0]?.url || "https://via.placeholder.com/300",
+            imgTopic:
+              spotifyArtist.images[0]?.url || "https://via.placeholder.com/300",
             content: `Thể loại ${topicName}`,
           });
           await topic.save();
@@ -381,7 +384,9 @@ export const importMultipleArtists = async (req: Request, res: Response) => {
           genre: topicName,
         });
 
-        console.log(`✅ Hoàn thành: ${spotifyArtist.name} - ${importCount} bài`);
+        console.log(
+          `✅ Hoàn thành: ${spotifyArtist.name} - ${importCount} bài`
+        );
       } catch (error: any) {
         console.error(`❌ Lỗi nghệ sĩ: ${artistName}`, error.message);
         results.push({
@@ -399,7 +404,9 @@ export const importMultipleArtists = async (req: Request, res: Response) => {
 
     res.json({
       success: true,
-      message: `Đã import ${totalImported} bài hát từ ${results.filter((r) => r.success).length}/${artists.length} nghệ sĩ`,
+      message: `Đã import ${totalImported} bài hát từ ${
+        results.filter((r) => r.success).length
+      }/${artists.length} nghệ sĩ`,
       results,
     });
   } catch (error: any) {
