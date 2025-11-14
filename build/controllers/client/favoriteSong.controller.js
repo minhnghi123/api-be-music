@@ -29,8 +29,17 @@ export const getAllFavoriteSongs = (req, res) => __awaiter(void 0, void 0, void 
         });
         const songsWithArtist = yield Promise.all(songs.map((song) => __awaiter(void 0, void 0, void 0, function* () {
             const songObj = song.toObject();
-            const artistInfo = yield mapArtistIdToInfo(song.artist);
-            songObj.artist = artistInfo || "Unknown Artist";
+            if (Array.isArray(song.artist)) {
+                const artistInfos = yield Promise.all(song.artist.map((artistId) => mapArtistIdToInfo(artistId)));
+                songObj.artist = artistInfos.filter(Boolean);
+            }
+            else if (song.artist) {
+                const artistInfo = yield mapArtistIdToInfo(song.artist);
+                songObj.artist = artistInfo || "Unknown Artist";
+            }
+            else {
+                songObj.artist = "Unknown Artist";
+            }
             return songObj;
         })));
         const favoriteSongIds = favoriteSongs.map((item) => item.song_id.toString());
@@ -80,8 +89,17 @@ export const getFavoriteSongById = (req, res) => __awaiter(void 0, void 0, void 
                 .json({ success: false, message: "Song not found" });
         }
         const songObj = song.toObject();
-        const artistInfo = yield mapArtistIdToInfo(song.artist);
-        songObj.artist = artistInfo || "Unknown Artist";
+        if (Array.isArray(song.artist)) {
+            const artistInfos = yield Promise.all(song.artist.map((artistId) => mapArtistIdToInfo(artistId)));
+            songObj.artist = artistInfos.filter(Boolean);
+        }
+        else if (song.artist) {
+            const artistInfo = yield mapArtistIdToInfo(song.artist);
+            songObj.artist = artistInfo || "Unknown Artist";
+        }
+        else {
+            songObj.artist = "Unknown Artist";
+        }
         return res.json({ success: true, data: songObj });
     }
     catch (error) {

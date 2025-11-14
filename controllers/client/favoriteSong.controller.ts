@@ -29,8 +29,17 @@ export const getAllFavoriteSongs = async (req: Request, res: Response) => {
     const songsWithArtist = await Promise.all(
       songs.map(async (song) => {
         const songObj = song.toObject();
-        const artistInfo = await mapArtistIdToInfo(song.artist);
-        (songObj as any).artist = artistInfo || "Unknown Artist";
+        if (Array.isArray(song.artist)) {
+          const artistInfos = await Promise.all(
+            song.artist.map((artistId) => mapArtistIdToInfo(artistId))
+          );
+          (songObj as any).artist = artistInfos.filter(Boolean);
+        } else if (song.artist) {
+          const artistInfo = await mapArtistIdToInfo(song.artist);
+          (songObj as any).artist = artistInfo || "Unknown Artist";
+        } else {
+          (songObj as any).artist = "Unknown Artist";
+        }
         return songObj;
       })
     );
@@ -92,8 +101,17 @@ export const getFavoriteSongById = async (req: Request, res: Response) => {
     }
 
     const songObj = song.toObject();
-    const artistInfo = await mapArtistIdToInfo(song.artist);
-    (songObj as any).artist = artistInfo || "Unknown Artist";
+    if (Array.isArray(song.artist)) {
+      const artistInfos = await Promise.all(
+        song.artist.map((artistId) => mapArtistIdToInfo(artistId))
+      );
+      (songObj as any).artist = artistInfos.filter(Boolean);
+    } else if (song.artist) {
+      const artistInfo = await mapArtistIdToInfo(song.artist);
+      (songObj as any).artist = artistInfo || "Unknown Artist";
+    } else {
+      (songObj as any).artist = "Unknown Artist";
+    }
 
     return res.json({ success: true, data: songObj });
   } catch (error) {

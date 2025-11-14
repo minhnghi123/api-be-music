@@ -35,7 +35,7 @@ export const index = async (req: Request, res: Response) => {
     });
     for (const song of songs) {
       if (artist?.fullName) {
-        song.artist = artist.fullName;
+        song.artist = [artist.fullName];
       }
     }
     const favoriteSongs = await getFavoriteSongOfUser(userID);

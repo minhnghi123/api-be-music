@@ -22,7 +22,7 @@ export const index = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             $in: playlist === null || playlist === void 0 ? void 0 : playlist.songs,
         },
     })
-        .select("title fileUrl coverImage artist")
+        .select("title fileUrl coverImage artist lyrics")
         .populate({
         path: "artist",
         match: { status: "active", deleted: false },
