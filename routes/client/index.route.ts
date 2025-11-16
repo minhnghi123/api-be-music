@@ -10,12 +10,12 @@ import { authUserInMainPage } from "../../middlewares/client/auth.middleware.js"
 const routeClient = (app: any) => {
   app.use("/auth", authRoute);
   app.use("/music", musicRoute);
+  app.use("/artist", artistRoute);
   app.use(authUserInMainPage);
   app.use("/", homeRoute);
   app.use("/favorite-songs", favoriteSongRoute);
   app.use("/playlist", playlistRoute);
   app.use("/topics", topicRoute);
   app.use("/user", userRoute);
-  app.use("/artist", artistRoute);
 };
 export default routeClient;
