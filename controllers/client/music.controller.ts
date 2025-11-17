@@ -9,6 +9,7 @@ import { mapArtistIdToInfo } from "../../utils/client/mapArtistIdToInfo.util.js"
 export const getAllSongs = async (req: Request, res: Response) => {
   try {
     const songs = await Song.find({ deleted: false, status: "active" });
+
     // format artist name
     const formattedSongs = await Promise.all(
       songs.map(async (song) => {
@@ -26,13 +27,16 @@ export const getAllSongs = async (req: Request, res: Response) => {
         return { ...song.toObject(), artist: artistInfo };
       })
     );
+
     res.json({ success: true, data: formattedSongs });
+
   } catch (err) {
     res
       .status(500)
       .json({ success: false, message: "Server error", error: err });
   }
 };
+
 
 // Get song by ID
 export const getSongById = async (req: Request, res: Response) => {
@@ -122,16 +126,14 @@ export const deleteSong = async (req: Request, res: Response) => {
 // Get a random song
 export const getRandomSong = async (req: Request, res: Response) => {
   try {
-    const count = parseInt(req.query.count as string) || 10; // mặc định 10 bài
+    const count = parseInt(req.query.count as string) || 10;
 
-    // Lấy random bài hát (chỉ những bài active, chưa xoá)
     const songs = await Song.aggregate([
       { $match: { deleted: false, status: "active" } },
-      { $sample: { size: count } },
+      { $sample: { size: count } }
     ]);
 
-    // Map artistId -> thông tin artist chi tiết
-    const populatedSongs = await Promise.all(
+    const finalSongs = await Promise.all(
       songs.map(async (song) => {
         let artistInfo;
         if (Array.isArray(song.artist)) {
@@ -146,23 +148,28 @@ export const getRandomSong = async (req: Request, res: Response) => {
         }
         return {
           ...song,
-          artist: artistInfo,
+          artist: artistInfo
         };
+
+        // CHỈ RETURN 1 PHẦN TỬ, KHÔNG PUSH NGOÀI MẢNG
+        return normalizeSong(formattedSong);
       })
     );
 
-    res.status(200).json({
+    return res.json({
       success: true,
-      data: populatedSongs,
+      data: finalSongs
     });
+
   } catch (error) {
     console.error("Error getRandomSongs:", error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Lỗi server khi lấy gợi ý bài hát",
     });
   }
 };
+
 
 // Get all artists
 export const getAllArtists = async (req: Request, res: Response) => {

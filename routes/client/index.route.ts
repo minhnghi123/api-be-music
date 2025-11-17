@@ -22,6 +22,5 @@ const routeClient = (app: any) => {
   app.use("/playlist", playlistRoute);
   app.use("/topics", topicRoute);
   app.use("/user", userRoute);
-  app.use("/artist", artistRoute);
 };
 export default routeClient;
