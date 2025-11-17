@@ -5,6 +5,7 @@ import Song from "../../models/song.model.js";
 import { getFavoriteSongOfUser } from "../../utils/client/getFavoriteSong.util.js";
 import getUserInfo from "../../utils/client/getUserInfo.util.js";
 import { getPlaylistOfUser } from "../../utils/client/getPlaylist.util.js";
+import { mapArtistIdToInfo } from "../../utils/client/mapArtistIdToInfo.util.js";
 export const index = async (req: Request, res: Response) => {
   try {
     const userID = getUserInfo(req, res);
@@ -33,19 +34,35 @@ export const index = async (req: Request, res: Response) => {
       artist: id,
       deleted: false,
     });
-    for (const song of songs) {
-      if (artist?.fullName) {
-        song.artist = [artist.fullName];
-      }
-    }
+    console.log(songs);
+
+    // Format artist info
+    const formattedSongs = await Promise.all(
+      songs.map(async (song) => {
+        let artistInfo;
+        if (Array.isArray(song.artist)) {
+          const artistInfos = await Promise.all(
+            song.artist.map((artistId) => mapArtistIdToInfo(artistId))
+          );
+          artistInfo = artistInfos.filter(Boolean);
+        } else if (song.artist) {
+          artistInfo = await mapArtistIdToInfo(song.artist);
+        } else {
+          artistInfo = "Unknown Artist";
+        }
+        return { ...song.toObject(), artist: artistInfo };
+      })
+    );
+
     const favoriteSongs = await getFavoriteSongOfUser(userID);
     const favoriteSongIds = favoriteSongs.map((item) =>
       item.song_id.toString()
     );
+
     res.json({
       success: true,
       artist,
-      songs,
+      songs: formattedSongs,
       followArtistsIds,
       individualPlaylists,
       favoriteSongIds,

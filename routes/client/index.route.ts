@@ -14,7 +14,6 @@ const routeClient = (app: any) => {
   app.use("/auth", authRoute);
   app.use("/music", musicRoute);
   app.use("/comments", commentRoute);
-
   // Áp dụng auth middleware cho các routes còn lại
   app.use(requireAuth);
   app.use("/", homeRoute);
@@ -22,5 +21,6 @@ const routeClient = (app: any) => {
   app.use("/playlist", playlistRoute);
   app.use("/topics", topicRoute);
   app.use("/user", userRoute);
+  app.use("/artist", artistRoute);
 };
 export default routeClient;
