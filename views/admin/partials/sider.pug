@@ -1,21 +1,92 @@
-.sider
-  .inner-menu
-    ul
-      li
-        a(href=`/${prefixAdmin}/dashboard`) Tổng quan
-      li
-        a(href=`/${prefixAdmin}/topics`) Quản lý chủ đề
-      li
-        a(href=`/${prefixAdmin}/songs`) Quản lý bài hát
-      li
-        a(href=`/${prefixAdmin}/playlists`) Quản lý Playlists
-      li
-        a(href=`/${prefixAdmin}/singers`) Quản lý ca sĩ
-      li
-        a(href=`/${prefixAdmin}/roles/permissions`) Phân quyền
-      li
-        a(href=`/${prefixAdmin}/accounts/admin`) Tài khoản admin
-      li
-        a(href=`/${prefixAdmin}/accounts/customer`) Tài khoản khách hàng
-      li
-        a(href=`/${prefixAdmin}/settings/general`) Cài đặt chung
+// Desktop Sidebar
+aside.admin-sidebar.d-none.d-lg-block
+  .sidebar-content
+    .sidebar-header
+      h5.text-white.mb-0
+        i.fas.fa-tachometer-alt.me-2
+        | Dashboard
+    nav.sidebar-nav
+      ul.nav.flex-column
+        li.nav-item
+          a.nav-link(href=`/${prefixAdmin}/dashboard`, class=pageTitle === 'Dashboard' ? 'active' : '')
+            i.fas.fa-home.me-2
+            | Dashboard
+        li.nav-item
+          a.nav-link(href=`/${prefixAdmin}/topics`, class=pageTitle === 'Topics' ? 'active' : '')
+            i.fas.fa-tags.me-2
+            | Topics
+        li.nav-item
+          a.nav-link(href=`/${prefixAdmin}/songs`, class=pageTitle === 'Songs' ? 'active' : '')
+            i.fas.fa-music.me-2
+            | Songs
+        li.nav-item
+          a.nav-link(href=`/${prefixAdmin}/playlists`, class=pageTitle === 'Playlists' ? 'active' : '')
+            i.fas.fa-list.me-2
+            | Playlists
+        li.nav-item
+          a.nav-link(href=`/${prefixAdmin}/singers`, class=pageTitle === 'Artists' ? 'active' : '')
+            i.fas.fa-microphone.me-2
+            | Artists
+        li.nav-item
+          a.nav-link(href=`/${prefixAdmin}/roles/permissions`, class=pageTitle === 'Permissions' ? 'active' : '')
+            i.fas.fa-shield-alt.me-2
+            | Permissions
+        li.nav-item
+          a.nav-link(href=`/${prefixAdmin}/accounts/admin`, class=pageTitle === 'Admin Accounts' ? 'active' : '')
+            i.fas.fa-user-shield.me-2
+            | Admin Accounts
+        li.nav-item
+          a.nav-link(href=`/${prefixAdmin}/accounts/customer`, class=pageTitle === 'Customer Accounts' ? 'active' : '')
+            i.fas.fa-users.me-2
+            | Customer Accounts
+        li.nav-item
+          a.nav-link(href=`/${prefixAdmin}/settings/general`, class=pageTitle === 'Settings' ? 'active' : '')
+            i.fas.fa-cog.me-2
+            | Settings
+
+// Mobile Sidebar (Offcanvas)
+.offcanvas.offcanvas-start#sidebar(tabindex="-1")
+  .offcanvas-header.bg-primary
+    h5.offcanvas-title.text-white
+      i.fas.fa-music.me-2
+      | Music Admin
+    button.btn-close.btn-close-white(type="button", data-bs-dismiss="offcanvas")
+  .offcanvas-body.p-0
+    nav.sidebar-nav
+      ul.nav.flex-column
+        li.nav-item
+          a.nav-link(href=`/${prefixAdmin}/dashboard`, class=pageTitle === 'Dashboard' ? 'active' : '')
+            i.fas.fa-home.me-2
+            | Dashboard
+        li.nav-item
+          a.nav-link(href=`/${prefixAdmin}/topics`, class=pageTitle === 'Topics' ? 'active' : '')
+            i.fas.fa-tags.me-2
+            | Topics
+        li.nav-item
+          a.nav-link(href=`/${prefixAdmin}/songs`, class=pageTitle === 'Songs' ? 'active' : '')
+            i.fas.fa-music.me-2
+            | Songs
+        li.nav-item
+          a.nav-link(href=`/${prefixAdmin}/playlists`, class=pageTitle === 'Playlists' ? 'active' : '')
+            i.fas.fa-list.me-2
+            | Playlists
+        li.nav-item
+          a.nav-link(href=`/${prefixAdmin}/singers`, class=pageTitle === 'Artists' ? 'active' : '')
+            i.fas.fa-microphone.me-2
+            | Artists
+        li.nav-item
+          a.nav-link(href=`/${prefixAdmin}/roles/permissions`, class=pageTitle === 'Permissions' ? 'active' : '')
+            i.fas.fa-shield-alt.me-2
+            | Permissions
+        li.nav-item
+          a.nav-link(href=`/${prefixAdmin}/accounts/admin`, class=pageTitle === 'Admin Accounts' ? 'active' : '')
+            i.fas.fa-user-shield.me-2
+            | Admin Accounts
+        li.nav-item
+          a.nav-link(href=`/${prefixAdmin}/accounts/customer`, class=pageTitle === 'Customer Accounts' ? 'active' : '')
+            i.fas.fa-users.me-2
+            | Customer Accounts
+        li.nav-item
+          a.nav-link(href=`/${prefixAdmin}/settings/general`, class=pageTitle === 'Settings' ? 'active' : '')
+            i.fas.fa-cog.me-2
+            | Settings

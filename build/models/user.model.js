@@ -4,10 +4,6 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String },
     avatar: { type: String, default: "" },
-    playlist: {
-        type: Array,
-        default: [],
-    },
     follow_songs: {
         type: Array,
         default: [],

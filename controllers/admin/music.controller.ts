@@ -8,12 +8,25 @@ export const index = async (req: Request, res: Response) => {
     deleted: false,
   });
   for (const song of songs) {
-    const artist = await Artist.findOne({
-      _id: song.artist,
-      deleted: false,
-      status: "active",
-    });
-    song["artist"] = artist ? artist.fullName : "Không tìm thấy nghệ sĩ";
+    // Xử lý nhiều ca sĩ
+    const artistIds = Array.isArray(song.artist) ? song.artist : [song.artist];
+    const artistNames = [];
+
+    for (const artistId of artistIds) {
+      const artist = await Artist.findOne({
+        _id: artistId,
+        deleted: false,
+        status: "active",
+      });
+      if (artist) {
+        artistNames.push(artist.fullName);
+      }
+    }
+
+    (song as any)["artist"] =
+      artistNames.length > 0
+        ? artistNames.join(", ")
+        : "Không tìm thấy nghệ sĩ";
     // console.log(song.topic);
     let topicTitle = "Không có chủ đề";
     if (Array.isArray(song.topic) && song.topic.length > 0) {
@@ -45,16 +58,19 @@ export const createPost = async (req: Request, res: Response) => {
     const {
       title,
       topicId,
-      singerId,
+      singerId, // Có thể là array hoặc string
       lyrics,
       description,
       status,
       avatar,
       audio,
     } = req.body;
+
+    const artistIds = Array.isArray(singerId) ? singerId : [singerId];
+
     const songInfo = {
       title,
-      artist: singerId,
+      artist: artistIds,
       topic: topicId,
       fileUrl: audio?.[0] ?? "",
       coverImage: avatar?.[0] ?? "",

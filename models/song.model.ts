@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const songSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
-    artist: { type: String, required: true },
+    artist: { type: [String], required: true }, // Đổi thành array để hỗ trợ nhiều ca sĩ
     album: { type: String, default: "" },
     topic: { type: Array, default: [] },
     fileUrl: { type: String, required: true },

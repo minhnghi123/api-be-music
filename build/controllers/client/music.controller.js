@@ -17,7 +17,17 @@ export const getAllSongs = (req, res) => __awaiter(void 0, void 0, void 0, funct
     try {
         const songs = yield Song.find({ deleted: false, status: "active" });
         const formattedSongs = yield Promise.all(songs.map((song) => __awaiter(void 0, void 0, void 0, function* () {
-            const artistInfo = yield mapArtistIdToInfo(song.artist);
+            let artistInfo;
+            if (Array.isArray(song.artist)) {
+                const artistInfos = yield Promise.all(song.artist.map((artistId) => mapArtistIdToInfo(artistId)));
+                artistInfo = artistInfos.filter(Boolean);
+            }
+            else if (song.artist) {
+                artistInfo = yield mapArtistIdToInfo(song.artist);
+            }
+            else {
+                artistInfo = "Unknown Artist";
+            }
             return Object.assign(Object.assign({}, song.toObject()), { artist: artistInfo });
         })));
         res.json({ success: true, data: formattedSongs });
@@ -36,7 +46,17 @@ export const getSongById = (req, res) => __awaiter(void 0, void 0, void 0, funct
                 .status(404)
                 .json({ success: false, message: "Song not found" });
         }
-        const artistInfo = yield mapArtistIdToInfo(song.artist);
+        let artistInfo;
+        if (Array.isArray(song.artist)) {
+            const artistInfos = yield Promise.all(song.artist.map((artistId) => mapArtistIdToInfo(artistId)));
+            artistInfo = artistInfos.filter(Boolean);
+        }
+        else if (song.artist) {
+            artistInfo = yield mapArtistIdToInfo(song.artist);
+        }
+        else {
+            artistInfo = "Unknown Artist";
+        }
         res.json({
             success: true,
             data: Object.assign(Object.assign({}, song.toObject()), { artist: artistInfo }),
@@ -102,7 +122,17 @@ export const getRandomSong = (req, res) => __awaiter(void 0, void 0, void 0, fun
             { $sample: { size: count } },
         ]);
         const populatedSongs = yield Promise.all(songs.map((song) => __awaiter(void 0, void 0, void 0, function* () {
-            const artistInfo = yield mapArtistIdToInfo(song.artist);
+            let artistInfo;
+            if (Array.isArray(song.artist)) {
+                const artistInfos = yield Promise.all(song.artist.map((artistId) => mapArtistIdToInfo(artistId)));
+                artistInfo = artistInfos.filter(Boolean);
+            }
+            else if (song.artist) {
+                artistInfo = yield mapArtistIdToInfo(song.artist);
+            }
+            else {
+                artistInfo = "Unknown Artist";
+            }
             return Object.assign(Object.assign({}, song), { artist: artistInfo });
         })));
         res.status(200).json({

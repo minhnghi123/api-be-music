@@ -1,50 +1,252 @@
 extends ../../layouts/default.pug
 
 block main
-    .d-flex.justify-content-end.mb-3
-       
-        a(
-            href=`/${prefixAdmin}/songs/create`
-            class="btn btn-success"
-            ) + Thêm mới Thêm Bài Hát
-
-    //- Search and Filter Form
-    .d-flex.justify-content-between.mb-3.search-form
-        form.d-flex.align-items-center
-            input.form-control.me-2(type="text", placeholder="Tìm kiếm bài hát...", name="search")
-            button.btn.btn-primary(type="submit") Tìm kiếm
-
-    .table-responsive
-
-
-        table.table.table-striped.table-bordered
-            thead.table-primary
+  .music-management-page
+    // Page Header
+    .page-header.mb-4
+      h1.page-title.fade-in-up
+        i.fas.fa-music.me-3
+        | Music Management
+      p.page-subtitle.text-muted.fade-in-up Manage your music library, tracks, and audio content
+    
+    // Action Bar
+    .action-bar.mb-4
+      .row.align-items-center
+        .col-md-6
+          .d-flex.align-items-center
+            .search-box.me-3
+              .input-group
+                input.form-control(type="text", placeholder="Search songs...", name="search")
+                button.btn.btn-outline-primary(type="button")
+                  i.fas.fa-search
+            .filter-dropdown.me-3
+              select.form-select
+                option(value="") All Genres
+                option(value="pop") Pop
+                option(value="rock") Rock
+                option(value="hip-hop") Hip-Hop
+                option(value="electronic") Electronic
+            .filter-dropdown
+              select.form-select
+                option(value="") All Artists
+                option(value="artist1") Artist 1
+                option(value="artist2") Artist 2
+        .col-md-6
+          .d-flex.justify-content-end
+            a.btn.btn-primary(href=`/${prefixAdmin}/songs/create`)
+              i.fas.fa-plus.me-2
+              | Add New Song
+    
+    // Stats Cards
+    .row.mb-4
+      .col-xl-3.col-md-6.mb-3
+        .stats-card.bg-gradient-primary
+          .d-flex.justify-content-between.align-items-center
+            .stats-content
+              .stats-number #{songs ? songs.length : 0}
+              .stats-label Total Songs
+            .stats-icon
+              i.fas.fa-music
+      
+      .col-xl-3.col-md-6.mb-3
+        .stats-card.bg-gradient-success
+          .d-flex.justify-content-between.align-items-center
+            .stats-content
+              .stats-number #{songs ? songs.filter(song => song.status === 'published').length : 0}
+              .stats-label Published
+            .stats-icon
+              i.fas.fa-check-circle
+      
+      .col-xl-3.col-md-6.mb-3
+        .stats-card.bg-gradient-warning
+          .d-flex.justify-content-between.align-items-center
+            .stats-content
+              .stats-number #{songs ? songs.filter(song => song.status === 'draft').length : 0}
+              .stats-label Drafts
+            .stats-icon
+              i.fas.fa-edit
+      
+      .col-xl-3.col-md-6.mb-3
+        .stats-card.bg-gradient-info
+          .d-flex.justify-content-between.align-items-center
+            .stats-content
+              .stats-number #{songs ? songs.reduce((total, song) => total + (song.plays || 0), 0) : 0}
+              .stats-label Total Plays
+            .stats-icon
+              i.fas.fa-play
+    
+    // Songs Table
+    .card.table-container
+      .card-header
+        h5.mb-0
+          i.fas.fa-list.me-2
+          | Music Library
+        .card-header-actions
+          .btn-group(role="group")
+            button.btn.btn-outline-primary.btn-sm(type="button")
+              i.fas.fa-download.me-1
+              | Export
+            button.btn.btn-outline-secondary.btn-sm(type="button")
+              i.fas.fa-filter.me-1
+              | Filter
+      
+      .card-body.p-0
+        .table-responsive
+          table.table.table-hover.mb-0
+            thead
+              tr
+                th.text-center
+                  input.form-check-input(type="checkbox", id="selectAllSongs")
+                th
+                  i.fas.fa-image.me-1
+                  | Cover
+                th
+                  i.fas.fa-music.me-1
+                  | Song
+                th
+                  i.fas.fa-microphone.me-1
+                  | Artist
+                th
+                  i.fas.fa-compact-disc.me-1
+                  | Album
+                th
+                  i.fas.fa-tags.me-1
+                  | Genre
+                th
+                  i.fas.fa-clock.me-1
+                  | Duration
+                th
+                  i.fas.fa-chart-line.me-1
+                  | Plays
+                th.text-center
+                  i.fas.fa-cog.me-1
+                  | Actions
+            
+            tbody
+              if songs && songs.length > 0
+                each song, index in songs
+                  tr
+                    td.text-center
+                      input.form-check-input(type="checkbox", name="songIds", value=song.id)
+                    td
+                      .song-cover
+                        img.rounded(src=song.coverImage || "/src/song_pic1.jpg", alt=song.title, width="50", height="50")
+                    td
+                      .song-info
+                        .song-title.fw-semibold #{song.title}
+                        .song-id.text-muted.small ID: #{song.id}
+                    td
+                      .artist-info
+                        .artist-name #{song.artist}
+                    td
+                      .album-info
+                        if song.album
+                          span #{song.album}
+                        else
+                          span.text-muted Single
+                    td
+                      .genre-badge
+                        if song.topic
+                          span.badge.bg-secondary #{song.topic}
+                        else
+                          span.text-muted N/A
+                    td
+                      .duration
+                        if song.duration
+                          span #{song.duration}
+                        else
+                          span.text-muted N/A
+                    td
+                      .plays-count
+                        span.badge.bg-info #{song.plays || 0}
+                    td.text-center
+                      .dropdown
+                        button.btn.btn-sm.btn-outline-secondary.dropdown-toggle(type="button", data-bs-toggle="dropdown")
+                          i.fas.fa-ellipsis-v
+                        ul.dropdown-menu.dropdown-menu-end
+                          li
+                            a.dropdown-item(href=`/${prefixAdmin}/songs/view/${song.id}`)
+                              i.fas.fa-eye.me-2
+                              | View Details
+                          li
+                            a.dropdown-item(href=`/${prefixAdmin}/songs/edit/${song.id}`)
+                              i.fas.fa-edit.me-2
+                              | Edit
+                          li
+                            a.dropdown-item(href="#")
+                              i.fas.fa-play.me-2
+                              | Preview
+                          li
+                            a.dropdown-item(href="#")
+                              i.fas.fa-chart-line.me-2
+                              | Analytics
+                          li
+                            hr.dropdown-divider
+                          li
+                            a.dropdown-item.text-danger(href="#", data-bs-toggle="modal", data-bs-target="#deleteModal", data-song-id=song.id, data-song-title=song.title)
+                              i.fas.fa-trash.me-2
+                              | Delete
+              else
                 tr
-                    th Số thứ tự
-                    th Hình Ảnh
-                    th Tiêu Đề
-                    th Ca Sĩ
-                    th Album
-                    th Thể Loại
-                    th Hành Động
-            tbody 
-                each song, idx in songs
-                    tr
-                        td #{idx + 1}
-                        td 
-                            img(src=song.coverImage, alt=`${song.title}`, width="100")
-                        td #{song.title}
-                        td #{song.artist}
-                        td #{song.album}
-                        td #{song.topic}          
-                        td 
-                            .action-container
-                                span.action-toggle 
-                                .action-buttons.hidden
-                                    a(href=`/${prefixAdmin}/songs/edit/${song.id}`) 
-                                        button.btn.btn-warning.edit-btn(data-bs-toggle="modal", data-bs-target="#editSongModal") Sửa
-                                    a.trigger-btn(href="#myModal", data-toggle="modal")
-                                        button.btn.btn-danger.delete-btn(data-bs-toggle="modal"
-                                        button-delete=song.id
-                                        link =`/${prefixAdmin}/songs/delete/${song.id}`) Xóa
-    include ../../partials/delete-confirm.pug
+                  td.text-center.py-5(colspan="9")
+                    .empty-state
+                      i.fas.fa-music.fs-1.text-muted.mb-3
+                      h5.text-muted No songs found
+                      p.text-muted Get started by adding your first song to the library.
+                      a.btn.btn-primary(href=`/${prefixAdmin}/songs/create`)
+                        i.fas.fa-plus.me-2
+                        | Add Song
+    
+    // Pagination
+    if songs && songs.length > 0
+      .d-flex.justify-content-between.align-items-center.mt-4
+        .pagination-info
+          span.text-muted Showing 1 to #{songs.length} of #{songs.length} entries
+        nav
+          ul.pagination.pagination-sm.mb-0
+            li.page-item.disabled
+              a.page-link(href="#") Previous
+            li.page-item.active
+              a.page-link(href="#") 1
+            li.page-item.disabled
+              a.page-link(href="#") Next
+
+  // Delete Confirmation Modal
+  .modal.fade#deleteModal(tabindex="-1")
+    .modal-dialog
+      .modal-content
+        .modal-header.bg-danger.text-white
+          h5.modal-title
+            i.fas.fa-exclamation-triangle.me-2
+            | Confirm Deletion
+          button.btn-close.btn-close-white(type="button", data-bs-dismiss="modal")
+        .modal-body
+          p Are you sure you want to delete song 
+            strong#deleteSongTitle
+            | ? This action cannot be undone.
+        .modal-footer
+          button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Cancel
+          button.btn.btn-danger#confirmDelete
+            i.fas.fa-trash.me-2
+            | Delete Song
+
+  script.
+    // Delete confirmation
+    document.getElementById('deleteModal').addEventListener('show.bs.modal', function (event) {
+      const button = event.relatedTarget;
+      const songId = button.getAttribute('data-song-id');
+      const songTitle = button.getAttribute('data-song-title');
+      
+      document.getElementById('deleteSongTitle').textContent = songTitle;
+      document.getElementById('confirmDelete').onclick = function() {
+        window.location.href = `/${prefixAdmin}/songs/delete/${songId}`;
+      };
+    });
+
+    // Select all functionality
+    document.getElementById('selectAllSongs').addEventListener('change', function() {
+      const checkboxes = document.querySelectorAll('input[name="songIds"]');
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+      });
+    });

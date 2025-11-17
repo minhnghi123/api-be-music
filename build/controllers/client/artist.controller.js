@@ -41,7 +41,7 @@ export const index = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         });
         for (const song of songs) {
             if (artist === null || artist === void 0 ? void 0 : artist.fullName) {
-                song.artist = artist.fullName;
+                song.artist = [artist.fullName];
             }
         }
         const favoriteSongs = yield getFavoriteSongOfUser(userID);

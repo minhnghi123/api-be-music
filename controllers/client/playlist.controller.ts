@@ -7,22 +7,19 @@ export const index = async (req: Request, res: Response) => {
     _id: req.params.id,
     deleted: false,
   });
+  console.log(req.params.id);
   const songs = await Song.find({ status: "active", deleted: false });
   const songsInPlaylist = await Song.find({
     _id: {
       $in: playlist?.songs,
     },
-  }).select("title fileUrl coverImage artist");
-  for (const song of songsInPlaylist) {
-    const artist = await Artist.findOne({
-      _id: song.artist,
-      status: "active",
-      deleted: false,
+  })
+    .select("title fileUrl coverImage artist lyrics")
+    .populate({
+      path: "artist",
+      match: { status: "active", deleted: false },
+      model: Artist,
     });
-    (song as any)["artist"] = artist
-      ? artist.fullName
-      : "Không tìm thấy nghệ sĩ";
-  }
 
   res.json({
     success: true,
@@ -62,23 +59,34 @@ export const addPlaylist = async (req: Request, res: Response) => {
     let songs: string[] = Array.isArray(playlist?.songs)
       ? playlist.songs.map((item: any) => item.toString())
       : [];
-    if (songs.includes(songID)) {
-      songs = songs.filter((item) => item != songID);
+    const exists = songs.includes(songID);
+    console.log(songID, songs, exists);
+    if (exists) {
+      return res.json({
+        success: false,
+        message: "Bài hát đã có trong playlist",
+      });
     } else {
       songs.push(songID);
-    }
-    if (playlist) {
-      playlist.songs = songs;
-      await Playlist.updateOne(
-        {
-          _id: req.body.playlist,
-          deleted: false,
-        },
-        { $set: { songs } }
-      );
+      if (playlist) {
+        playlist.songs = songs;
+        await Playlist.updateOne(
+          {
+            _id: req.body.playlist,
+            deleted: false,
+          },
+          { $set: { songs } }
+        );
+      }
+      return res.json({
+        success: true,
+        message: "Đã thêm bài hát vào playlist",
+        songs,
+      });
     }
   } catch (error) {
     console.log(error);
+    res.status(500).json({ success: false, error: "Internal server error" });
   }
 };
 

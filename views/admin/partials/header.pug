@@ -1,16 +1,39 @@
-header.header
+header.admin-header
   .container-fluid
-    .row.align-items-center
-      .col-3
-        .inner-logo
-          a(href=`/${prefixAdmin}/dashboard`) ADMIN
-      .col-9
-        div(class="text-right")
-          a(
-            href=`/${prefixAdmin}/my-account`
-            class="btn btn-primary btn-sm mr-2"
-          ) Le Van A
-          a(
-            href=`/${prefixAdmin}/auth/logout`
-            class="btn btn-danger btn-sm"
-          ) Đăng xuất
+    .d-flex.justify-content-between.align-items-center
+      .header-left.d-flex.align-items-center
+        button.btn.btn-link.text-white.d-lg-none.me-3(type="button", data-bs-toggle="offcanvas", data-bs-target="#sidebar")
+          i.fas.fa-bars.fs-4
+        .logo-section
+          a.logo-link(href=`/${prefixAdmin}/dashboard`)
+            i.fas.fa-music.me-2
+            span.logo-text Music Admin
+      .header-right.d-flex.align-items-center
+        .search-box.me-3
+          .input-group
+            input.form-control(type="text", placeholder="Search...")
+            button.btn.btn-outline-light(type="button")
+              i.fas.fa-search
+        .notifications.me-3
+          button.btn.btn-link.text-white.position-relative(type="button")
+            i.fas.fa-bell.fs-5
+            span.position-absolute.top-0.start-100.translate-middle.badge.rounded-pill.bg-danger 3
+        .user-menu.dropdown
+          button.btn.btn-link.text-white.dropdown-toggle.d-flex.align-items-center(type="button", data-bs-toggle="dropdown")
+            img.rounded-circle.me-2(src="/src/user.jpeg", alt="User", width="32", height="32")
+            span.d-none.d-md-inline Le Van A
+          ul.dropdown-menu.dropdown-menu-end
+            li
+              a.dropdown-item(href=`/${prefixAdmin}/my-account`)
+                i.fas.fa-user.me-2
+                | Profile
+            li
+              a.dropdown-item(href="#")
+                i.fas.fa-cog.me-2
+                | Settings
+            li
+              hr.dropdown-divider
+            li
+              a.dropdown-item.text-danger(href=`/${prefixAdmin}/auth/logout`)
+                i.fas.fa-sign-out-alt.me-2
+                | Logout

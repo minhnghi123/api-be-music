@@ -15,12 +15,22 @@ export const index = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         deleted: false,
     });
     for (const song of songs) {
-        const artist = yield Artist.findOne({
-            _id: song.artist,
-            deleted: false,
-            status: "active",
-        });
-        song["artist"] = artist ? artist.fullName : "Không tìm thấy nghệ sĩ";
+        const artistIds = Array.isArray(song.artist) ? song.artist : [song.artist];
+        const artistNames = [];
+        for (const artistId of artistIds) {
+            const artist = yield Artist.findOne({
+                _id: artistId,
+                deleted: false,
+                status: "active",
+            });
+            if (artist) {
+                artistNames.push(artist.fullName);
+            }
+        }
+        song["artist"] =
+            artistNames.length > 0
+                ? artistNames.join(", ")
+                : "Không tìm thấy nghệ sĩ";
         let topicTitle = "Không có chủ đề";
         if (Array.isArray(song.topic) && song.topic.length > 0) {
             const topic = yield Topic.findOne({
@@ -51,9 +61,10 @@ export const createPost = (req, res) => __awaiter(void 0, void 0, void 0, functi
     var _a, _b;
     try {
         const { title, topicId, singerId, lyrics, description, status, avatar, audio, } = req.body;
+        const artistIds = Array.isArray(singerId) ? singerId : [singerId];
         const songInfo = {
             title,
-            artist: singerId,
+            artist: artistIds,
             topic: topicId,
             fileUrl: (_a = audio === null || audio === void 0 ? void 0 : audio[0]) !== null && _a !== void 0 ? _a : "",
             coverImage: (_b = avatar === null || avatar === void 0 ? void 0 : avatar[0]) !== null && _b !== void 0 ? _b : "",

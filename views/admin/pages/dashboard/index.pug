@@ -1,3 +1,313 @@
 extends ../../layouts/default.pug
+
 block main
-  h1 #{pageTitle}
+  .dashboard-container
+    // Page Header
+    .page-header.mb-4
+      h1.page-title.fade-in-up
+        i.fas.fa-tachometer-alt.me-3
+        | Dashboard Overview
+      p.page-subtitle.text-muted.fade-in-up Welcome back! Here's what's happening with your music platform.
+    
+    // Stats Cards
+    .row.mb-4
+      .col-xl-3.col-md-6.mb-3
+        .stats-card.bg-gradient-primary.fade-in-up
+          .d-flex.justify-content-between.align-items-center
+            .stats-content
+              .stats-number 1,234
+              .stats-label Total Users
+            .stats-icon
+              i.fas.fa-users
+          .stats-trend.mt-2
+            i.fas.fa-arrow-up.me-1
+            span +12% from last month
+      
+      .col-xl-3.col-md-6.mb-3
+        .stats-card.bg-gradient-success.fade-in-up
+          .d-flex.justify-content-between.align-items-center
+            .stats-content
+              .stats-number 5,678
+              .stats-label Total Songs
+            .stats-icon
+              i.fas.fa-music
+          .stats-trend.mt-2
+            i.fas.fa-arrow-up.me-1
+            span +8% from last month
+      
+      .col-xl-3.col-md-6.mb-3
+        .stats-card.bg-gradient-warning.fade-in-up
+          .d-flex.justify-content-between.align-items-center
+            .stats-content
+              .stats-number 234
+              .stats-label Playlists
+            .stats-icon
+              i.fas.fa-list
+          .stats-trend.mt-2
+            i.fas.fa-arrow-up.me-1
+            span +15% from last month
+      
+      .col-xl-3.col-md-6.mb-3
+        .stats-card.bg-gradient-danger.fade-in-up
+          .d-flex.justify-content-between.align-items-center
+            .stats-content
+              .stats-number 89
+              .stats-label Artists
+            .stats-icon
+              i.fas.fa-microphone
+          .stats-trend.mt-2
+            i.fas.fa-arrow-up.me-1
+            span +5% from last month
+    
+    // Charts Row
+    .row.mb-4
+      .col-xl-8.mb-4
+        .chart-container
+          .chart-header
+            h3.chart-title
+              i.fas.fa-chart-line.me-2
+              | User Activity Overview
+            .chart-controls
+              select.form-select.form-select-sm(style="width: auto;")
+                option(value="7") Last 7 days
+                option(value="30", selected) Last 30 days
+                option(value="90") Last 90 days
+          canvas#userActivityChart(height="300")
+      
+      .col-xl-4.mb-4
+        .chart-container
+          .chart-header
+            h3.chart-title
+              i.fas.fa-chart-pie.me-2
+              | Music Genres
+          canvas#genreChart(height="300")
+    
+    // Additional Charts Row
+    .row.mb-4
+      .col-xl-6.mb-4
+        .chart-container
+          .chart-header
+            h3.chart-title
+              i.fas.fa-chart-bar.me-2
+              | Monthly Revenue
+          canvas#revenueChart(height="250")
+      
+      .col-xl-6.mb-4
+        .chart-container
+          .chart-header
+            h3.chart-title
+              i.fas.fa-chart-area.me-2
+              | Top Songs Performance
+          canvas#topSongsChart(height="250")
+    
+    // Recent Activity & Quick Actions
+    .row
+      .col-xl-8.mb-4
+        .card
+          .card-header
+            h5.mb-0
+              i.fas.fa-clock.me-2
+              | Recent Activity
+          .card-body
+            .activity-list
+              .activity-item.d-flex.align-items-center.mb-3
+                .activity-icon.bg-primary.text-white.rounded-circle.d-flex.align-items-center.justify-content-center.me-3(style="width: 40px; height: 40px;")
+                  i.fas.fa-user-plus
+                .activity-content
+                  .activity-title New user registered
+                  .activity-time.text-muted.small 2 minutes ago
+              
+              .activity-item.d-flex.align-items-center.mb-3
+                .activity-icon.bg-success.text-white.rounded-circle.d-flex.align-items-center.justify-content-center.me-3(style="width: 40px; height: 40px;")
+                  i.fas.fa-music
+                .activity-content
+                  .activity-title New song uploaded
+                  .activity-time.text-muted.small 15 minutes ago
+              
+              .activity-item.d-flex.align-items-center.mb-3
+                .activity-icon.bg-warning.text-white.rounded-circle.d-flex.align-items-center.justify-content-center.me-3(style="width: 40px; height: 40px;")
+                  i.fas.fa-list
+                .activity-content
+                  .activity-title New playlist created
+                  .activity-time.text-muted.small 1 hour ago
+              
+              .activity-item.d-flex.align-items-center.mb-3
+                .activity-icon.bg-info.text-white.rounded-circle.d-flex.align-items-center.justify-content-center.me-3(style="width: 40px; height: 40px;")
+                  i.fas.fa-microphone
+                .activity-content
+                  .activity-title New artist added
+                  .activity-time.text-muted.small 2 hours ago
+      
+      .col-xl-4.mb-4
+        .card
+          .card-header
+            h5.mb-0
+              i.fas.fa-bolt.me-2
+              | Quick Actions
+          .card-body
+            .d-grid.gap-2
+              a.btn.btn-primary(href=`/${prefixAdmin}/songs/create`)
+                i.fas.fa-plus.me-2
+                | Add New Song
+              a.btn.btn-success(href=`/${prefixAdmin}/playlists/create`)
+                i.fas.fa-list.me-2
+                | Create Playlist
+              a.btn.btn-warning(href=`/${prefixAdmin}/singers/create`)
+                i.fas.fa-microphone.me-2
+                | Add Artist
+              a.btn.btn-info(href=`/${prefixAdmin}/topics/create`)
+                i.fas.fa-tags.me-2
+                | Create Topic
+              a.btn.btn-secondary(href=`/${prefixAdmin}/accounts/admin`)
+                i.fas.fa-users.me-2
+                | Manage Users
+
+  // Chart.js Scripts
+  script.
+    // User Activity Chart
+    const userActivityCtx = document.getElementById('userActivityChart').getContext('2d');
+    new Chart(userActivityCtx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        datasets: [{
+          label: 'Active Users',
+          data: [120, 190, 300, 500, 200, 300, 450, 600, 550, 700, 800, 950],
+          borderColor: '#6366f1',
+          backgroundColor: 'rgba(99, 102, 241, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4
+        }, {
+          label: 'New Users',
+          data: [50, 80, 120, 200, 100, 150, 200, 250, 220, 300, 350, 400],
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)'
+            }
+          },
+          x: {
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)'
+            }
+          }
+        }
+      }
+    });
+
+    // Genre Chart
+    const genreCtx = document.getElementById('genreChart').getContext('2d');
+    new Chart(genreCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Pop', 'Rock', 'Hip-Hop', 'Electronic', 'Jazz', 'Classical'],
+        datasets: [{
+          data: [30, 25, 20, 15, 5, 5],
+          backgroundColor: [
+            '#6366f1',
+            '#10b981',
+            '#f59e0b',
+            '#ef4444',
+            '#8b5cf6',
+            '#06b6d4'
+          ],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+          }
+        }
+      }
+    });
+
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(revenueCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'Revenue ($)',
+          data: [12000, 19000, 30000, 50000, 20000, 30000],
+          backgroundColor: 'rgba(99, 102, 241, 0.8)',
+          borderColor: '#6366f1',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)'
+            }
+          },
+          x: {
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)'
+            }
+          }
+        }
+      }
+    });
+
+    // Top Songs Chart
+    const topSongsCtx = document.getElementById('topSongsChart').getContext('2d');
+    new Chart(topSongsCtx, {
+      type: 'radar',
+      data: {
+        labels: ['Views', 'Likes', 'Shares', 'Downloads', 'Comments'],
+        datasets: [{
+          label: 'Song Performance',
+          data: [85, 90, 75, 80, 70],
+          backgroundColor: 'rgba(99, 102, 241, 0.2)',
+          borderColor: '#6366f1',
+          borderWidth: 2,
+          pointBackgroundColor: '#6366f1'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          r: {
+            beginAtZero: true,
+            max: 100
+          }
+        }
+      }
+    });

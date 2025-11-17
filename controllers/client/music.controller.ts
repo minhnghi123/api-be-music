@@ -13,7 +13,17 @@ export const getAllSongs = async (req: Request, res: Response) => {
     // format artist name
     const formattedSongs = await Promise.all(
       songs.map(async (song) => {
-        const artistInfo = await mapArtistIdToInfo(song.artist);
+        let artistInfo;
+        if (Array.isArray(song.artist)) {
+          const artistInfos = await Promise.all(
+            song.artist.map((artistId) => mapArtistIdToInfo(artistId))
+          );
+          artistInfo = artistInfos.filter(Boolean);
+        } else if (song.artist) {
+          artistInfo = await mapArtistIdToInfo(song.artist);
+        } else {
+          artistInfo = "Unknown Artist";
+        }
         return { ...song.toObject(), artist: artistInfo };
       })
     );
@@ -38,7 +48,17 @@ export const getSongById = async (req: Request, res: Response) => {
         .json({ success: false, message: "Song not found" });
     }
     // format artist name
-    const artistInfo = await mapArtistIdToInfo(song.artist);
+    let artistInfo;
+    if (Array.isArray(song.artist)) {
+      const artistInfos = await Promise.all(
+        song.artist.map((artistId) => mapArtistIdToInfo(artistId))
+      );
+      artistInfo = artistInfos.filter(Boolean);
+    } else if (song.artist) {
+      artistInfo = await mapArtistIdToInfo(song.artist);
+    } else {
+      artistInfo = "Unknown Artist";
+    }
     res.json({
       success: true,
       data: { ...song.toObject(), artist: artistInfo },
@@ -115,9 +135,18 @@ export const getRandomSong = async (req: Request, res: Response) => {
 
     const finalSongs = await Promise.all(
       songs.map(async (song) => {
-        const artistInfo = await mapArtistIdToInfo(song.artist);
-
-        const formattedSong = {
+        let artistInfo;
+        if (Array.isArray(song.artist)) {
+          const artistInfos = await Promise.all(
+            song.artist.map((artistId: string) => mapArtistIdToInfo(artistId))
+          );
+          artistInfo = artistInfos.filter(Boolean);
+        } else if (song.artist) {
+          artistInfo = await mapArtistIdToInfo(song.artist);
+        } else {
+          artistInfo = "Unknown Artist";
+        }
+        return {
           ...song,
           artist: artistInfo
         };

@@ -4,6 +4,7 @@ import { musicRoute } from "./music.route.js";
 import { topicRoute } from "./topic.route.js";
 import { accountRouter } from "./account.route.js";
 import { playlistRoute } from "./playlist.route.js";
+import { importRoutes } from "./import.route.js";
 const routeAdmin = (app) => {
     const path = systemConfig.prefixAdmin;
     app.use(`/${path}/dashboard`, dashboardRoute);
@@ -11,5 +12,6 @@ const routeAdmin = (app) => {
     app.use(`/${path}/topics`, topicRoute);
     app.use(`/${path}/playlists`, playlistRoute);
     app.use(`/${path}/accounts`, accountRouter);
+    app.use("/admin/import", importRoutes);
 };
 export default routeAdmin;
