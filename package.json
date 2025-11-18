@@ -12,6 +12,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.70.0",
+    "@google/generative-ai": "^0.24.1",
     "aplayer": "^1.10.1",
     "axios": "^1.13.2",
     "bcryptjs": "^2.4.3",
@@ -30,11 +32,13 @@
     "mongoose": "^8.8.3",
     "multer": "^1.4.5-lts.1",
     "nodemon": "^3.1.7",
+    "openai": "^6.9.1",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "pug": "^3.0.3",
     "spotify-web-api-node": "^5.0.2",
-    "streamifier": "^0.1.1"
+    "streamifier": "^0.1.1",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

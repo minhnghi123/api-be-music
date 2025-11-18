@@ -5,7 +5,10 @@ const songSchema = new mongoose.Schema(
     title: { type: String, required: true },
     artist: { type: [String], required: true }, // Đổi thành array để hỗ trợ nhiều ca sĩ
     album: { type: String, default: "" },
-    topic: { type: Array, default: [] },
+    topic: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Topic",
+    },
     fileUrl: { type: String, required: true },
     coverImage: { type: String },
     likes: { type: Array, default: [] },
