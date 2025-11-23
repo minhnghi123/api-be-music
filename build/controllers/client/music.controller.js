@@ -119,9 +119,9 @@ export const getRandomSong = (req, res) => __awaiter(void 0, void 0, void 0, fun
         const count = parseInt(req.query.count) || 10;
         const songs = yield Song.aggregate([
             { $match: { deleted: false, status: "active" } },
-            { $sample: { size: count } },
+            { $sample: { size: count } }
         ]);
-        const populatedSongs = yield Promise.all(songs.map((song) => __awaiter(void 0, void 0, void 0, function* () {
+        const finalSongs = yield Promise.all(songs.map((song) => __awaiter(void 0, void 0, void 0, function* () {
             let artistInfo;
             if (Array.isArray(song.artist)) {
                 const artistInfos = yield Promise.all(song.artist.map((artistId) => mapArtistIdToInfo(artistId)));
@@ -135,14 +135,14 @@ export const getRandomSong = (req, res) => __awaiter(void 0, void 0, void 0, fun
             }
             return Object.assign(Object.assign({}, song), { artist: artistInfo });
         })));
-        res.status(200).json({
+        return res.json({
             success: true,
-            data: populatedSongs,
+            data: finalSongs
         });
     }
     catch (error) {
         console.error("Error getRandomSongs:", error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Lỗi server khi lấy gợi ý bài hát",
         });

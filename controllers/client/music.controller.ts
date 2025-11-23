@@ -152,7 +152,7 @@ export const getRandomSong = async (req: Request, res: Response) => {
         };
 
         // CHỈ RETURN 1 PHẦN TỬ, KHÔNG PUSH NGOÀI MẢNG
-        return normalizeSong(formattedSong);
+        // return normalizeSong(formattedSong);
       })
     );
 

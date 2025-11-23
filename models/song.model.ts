@@ -15,6 +15,7 @@ const songSchema = new mongoose.Schema(
     lyrics: { type: String, default: "" },
     description: { type: String, default: "" },
     status: { type: String, default: "active" },
+    views: { type: Number, default: 0 },
     deleted: {
       type: Boolean,
       default: false,

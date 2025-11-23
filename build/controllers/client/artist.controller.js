@@ -13,6 +13,7 @@ import Song from "../../models/song.model.js";
 import { getFavoriteSongOfUser } from "../../utils/client/getFavoriteSong.util.js";
 import getUserInfo from "../../utils/client/getUserInfo.util.js";
 import { getPlaylistOfUser } from "../../utils/client/getPlaylist.util.js";
+import { mapArtistIdToInfo } from "../../utils/client/mapArtistIdToInfo.util.js";
 export const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userID = getUserInfo(req, res);
@@ -39,17 +40,27 @@ export const index = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             artist: id,
             deleted: false,
         });
-        for (const song of songs) {
-            if (artist === null || artist === void 0 ? void 0 : artist.fullName) {
-                song.artist = [artist.fullName];
+        console.log(songs);
+        const formattedSongs = yield Promise.all(songs.map((song) => __awaiter(void 0, void 0, void 0, function* () {
+            let artistInfo;
+            if (Array.isArray(song.artist)) {
+                const artistInfos = yield Promise.all(song.artist.map((artistId) => mapArtistIdToInfo(artistId)));
+                artistInfo = artistInfos.filter(Boolean);
             }
-        }
+            else if (song.artist) {
+                artistInfo = yield mapArtistIdToInfo(song.artist);
+            }
+            else {
+                artistInfo = "Unknown Artist";
+            }
+            return Object.assign(Object.assign({}, song.toObject()), { artist: artistInfo });
+        })));
         const favoriteSongs = yield getFavoriteSongOfUser(userID);
         const favoriteSongIds = favoriteSongs.map((item) => item.song_id.toString());
         res.json({
             success: true,
             artist,
-            songs,
+            songs: formattedSongs,
             followArtistsIds,
             individualPlaylists,
             favoriteSongIds,

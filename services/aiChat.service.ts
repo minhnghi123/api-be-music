@@ -555,7 +555,7 @@ export const generateSmartPlaylist = async (analysis: any, userId: string) => {
 
   // Tìm theo từ khóa trong title
   if (keywords && keywords.length > 0) {
-    const keywordRegex = keywords.map((kw) => new RegExp(kw, "i"));
+    const keywordRegex = keywords.map((kw: any) => new RegExp(kw, "i"));
     if (!query.$or) query.$or = [];
     query.$or.push({ title: { $in: keywordRegex } });
   }

@@ -7,7 +7,9 @@ import topicRoute from "./topic.route.js";
 import userRoute from "./user.route.js";
 import artistRoute from "./artist.route.js";
 import commentRoute from "./comment.route.js";
+import chatRoute from "./chat.route.js";
 import { requireAuth } from "../../middlewares/client/auth.middleware.js";
+import autoPlaylistRoute from "./autoPlaylist.route.js";
 const routeClient = (app) => {
     app.use("/auth", authRoute);
     app.use("/music", musicRoute);
@@ -19,5 +21,7 @@ const routeClient = (app) => {
     app.use("/topics", topicRoute);
     app.use("/user", userRoute);
     app.use("/artist", artistRoute);
+    app.use("/api/chat", chatRoute);
+    app.use("/api", autoPlaylistRoute);
 };
 export default routeClient;
